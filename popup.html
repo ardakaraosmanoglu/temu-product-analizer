@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fabric Finder</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      width: 300px;
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #ffffff;
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .header p {
+      font-size: 12px;
+      color: #888;
+    }
+
+    .info {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+
+    .info h3 {
+      font-size: 13px;
+      color: #667eea;
+      margin-bottom: 8px;
+    }
+
+    .info ul {
+      list-style: none;
+      font-size: 11px;
+      color: #666;
+    }
+
+    .info li {
+      padding: 4px 0;
+    }
+
+    .info li::before {
+      content: '\2022';
+      color: #667eea;
+      margin-right: 6px;
+    }
+
+    .status {
+      text-align: center;
+      padding: 12px;
+      background: #e8f5e9;
+      border-radius: 8px;
+      color: #2e7d32;
+      font-size: 12px;
+    }
+
+    .status.inactive {
+      background: #fff3e0;
+      color: #e65100;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>Fabric Finder</h1>
+    <p>E-commerce Fabric Detection</p>
+  </div>
+
+  <div class="info">
+    <h3>Supported Sites</h3>
+    <ul>
+      <li>Temu</li>
+      <li>Trendyol</li>
+      <li>SHEIN</li>
+      <li>Amazon</li>
+      <li>AliExpress</li>
+    </ul>
+  </div>
+
+  <div class="info">
+    <h3>How It Works</h3>
+    <ul>
+      <li>Open a product page</li>
+      <li>Fabric info appears automatically</li>
+      <li>Look for the floating widget</li>
+    </ul>
+  </div>
+
+  <div class="status" id="status">
+    Ready to scan
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
