@@ -1,13 +1,13 @@
-/* Fabric Finder - Widget Styles */
+/* Fabric Finder - Widget Styles v2.0 */
 
 .fabric-finder-widget {
   position: fixed;
   bottom: 20px;
   right: 20px;
-  width: 280px;
+  width: 300px;
   background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.18);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
   z-index: 2147483647;
   overflow: hidden;
@@ -29,7 +29,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: 14px 16px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: #ffffff;
 }
@@ -44,16 +44,23 @@
   background: transparent;
   border: none;
   color: #ffffff;
-  font-size: 20px;
+  font-size: 22px;
   cursor: pointer;
   padding: 0;
   line-height: 1;
   opacity: 0.8;
   transition: opacity 0.2s;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
 .fabric-finder-close:hover {
   opacity: 1;
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .fabric-finder-content {
@@ -64,11 +71,11 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  padding: 8px 0;
+  padding: 10px 0;
   border-bottom: 1px solid #f0f0f0;
 }
 
-.fabric-finder-row:last-child {
+.fabric-finder-row:last-of-type {
   border-bottom: none;
 }
 
@@ -84,15 +91,67 @@
   color: #333333;
   font-weight: 600;
   text-align: right;
-  max-width: 160px;
+  max-width: 180px;
   word-break: break-word;
+}
+
+.fabric-finder-warning {
+  margin-top: 12px;
+  padding: 10px 12px;
+  background: #fff3e0;
+  border-radius: 8px;
+  border-left: 3px solid #ff9800;
+  font-size: 11px;
+  color: #e65100;
+  line-height: 1.4;
+}
+
+.fabric-finder-warning.high-sensitivity {
+  background: #ffebee;
+  border-left-color: #f44336;
+  color: #c62828;
+}
+
+.fabric-finder-actions {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
+.fabric-finder-btn {
+  width: 100%;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.fabric-finder-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.fabric-finder-btn:active {
+  transform: translateY(0);
+}
+
+.fabric-finder-btn:disabled {
+  background: #ccc;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
 }
 
 .fabric-finder-not-found {
   text-align: center;
   color: #888888;
   font-size: 13px;
-  padding: 8px 0;
+  padding: 12px 0;
 }
 
 /* Responsive */

@@ -1,6 +1,6 @@
 /**
- * Fabric Finder - Content Script
- * Scans e-commerce product pages for fabric/material information
+ * Fabric Finder - Content Script v2.0
+ * Enhanced with Temu optimization, allergy warnings, favorites, and seasonal ratings
  */
 
 (function() {
@@ -14,30 +14,37 @@
   ];
 
   const FABRIC_TYPES = {
-    'polyester': 'Polyester',
-    'cotton': 'Cotton',
-    'wool': 'Wool',
-    'silk': 'Silk',
-    'linen': 'Linen',
-    'nylon': 'Nylon',
-    'spandex': 'Spandex',
-    'elastane': 'Elastane',
-    'viscose': 'Viscose',
-    'rayon': 'Rayon',
-    'acrylic': 'Acrylic',
-    'modal': 'Modal',
-    'tencel': 'Tencel',
-    'velvet': 'Velvet',
-    'denim': 'Denim',
-    'fleece': 'Fleece',
-    'satin': 'Satin',
-    'microfiber': 'Microfiber',
-    'polyamide': 'Polyamide'
+    'polyester': { name: 'Polyester', breathability: 2, warmth: 3, sensitivity: 'medium', warning: 'Synthetic fabric with low breathability' },
+    'cotton': { name: 'Cotton', breathability: 5, warmth: 3, sensitivity: 'low', warning: null },
+    'wool': { name: 'Wool', breathability: 3, warmth: 5, sensitivity: 'medium', warning: 'May cause irritation for sensitive skin' },
+    'silk': { name: 'Silk', breathability: 4, warmth: 2, sensitivity: 'low', warning: null },
+    'linen': { name: 'Linen', breathability: 5, warmth: 2, sensitivity: 'low', warning: null },
+    'nylon': { name: 'Nylon', breathability: 3, warmth: 3, sensitivity: 'medium', warning: 'Synthetic fabric' },
+    'spandex': { name: 'Spandex', breathability: 3, warmth: 2, sensitivity: 'medium', warning: 'Synthetic blend' },
+    'elastane': { name: 'Elastane', breathability: 3, warmth: 2, sensitivity: 'medium', warning: 'Synthetic blend' },
+    'viscose': { name: 'Viscose', breathability: 4, warmth: 2, sensitivity: 'low', warning: null },
+    'rayon': { name: 'Rayon', breathability: 4, warmth: 2, sensitivity: 'low', warning: null },
+    'acrylic': { name: 'Acrylic', breathability: 2, warmth: 4, sensitivity: 'high', warning: 'May cause skin irritation, not recommended for sensitive skin' },
+    'modal': { name: 'Modal', breathability: 4, warmth: 2, sensitivity: 'low', warning: null },
+    'tencel': { name: 'Tencel', breathability: 5, warmth: 2, sensitivity: 'low', warning: null },
+    'velvet': { name: 'Velvet', breathability: 2, warmth: 4, sensitivity: 'medium', warning: null },
+    'denim': { name: 'Denim', breathability: 3, warmth: 4, sensitivity: 'low', warning: null },
+    'fleece': { name: 'Fleece', breathability: 2, warmth: 5, sensitivity: 'medium', warning: 'Synthetic, may trap heat' },
+    'satin': { name: 'Satin', breathability: 3, warmth: 2, sensitivity: 'low', warning: null },
+    'microfiber': { name: 'Microfiber', breathability: 3, warmth: 3, sensitivity: 'medium', warning: 'Synthetic fabric' },
+    'polyamide': { name: 'Polyamide', breathability: 3, warmth: 3, sensitivity: 'medium', warning: 'Synthetic fabric' }
   };
 
   const SEASON_KEYWORDS = ['summer', 'winter', 'spring', 'autumn', 'fall', 'all seasons', 'mevsim', 'yaz', 'kış', 'ilkbahar', 'sonbahar'];
   const STRETCH_KEYWORDS = ['stretch', 'elastic', 'flexible', 'strech'];
   const WEAVE_KEYWORDS = ['knit', 'knitted', 'woven', 'dokuma', 'örme'];
+
+  // Fabric breathability ratings for seasonal recommendations
+  const SEASONALITY = {
+    summer: { minBreathability: 4, label: 'Best for Summer', icon: '☀️' },
+    winter: { minBreathability: 1, label: 'Best for Winter', icon: '❄️' },
+    allSeason: { minBreathability: 3, label: 'All Seasons', icon: '🌍' }
+  };
 
   let widget = null;
 
@@ -53,19 +60,91 @@
   function scanPage() {
     const data = {};
 
-    // 1. Scan JSON-LD structured data
+    // 1. Scan Temu-specific data structures (highest priority)
+    if (window.location.hostname.includes('temu.com')) {
+      scanTemuSpecific(data);
+    }
+
+    // 2. Scan JSON-LD structured data
     scanJsonLd(data);
 
-    // 2. Scan embedded scripts for product data
+    // 3. Scan embedded scripts for product data
     scanEmbeddedScripts(data);
 
-    // 3. Scan meta tags
+    // 4. Scan meta tags
     scanMetaTags(data);
 
-    // 4. Scan visible page content
+    // 5. Scan visible page content
     scanVisibleContent(data);
 
+    // 6. Calculate seasonal recommendation
+    calculateSeasonality(data);
+
+    // 7. Generate allergy/sensitivity warning
+    generateWarning(data);
+
     return data;
+  }
+
+  function scanTemuSpecific(data) {
+    // Temu uses __INITIAL_STATE__ for SSR data
+    const temuState = findGlobalVar('__INITIAL_STATE__');
+    if (temuState) {
+      extractFromObject(temuState, data);
+    }
+
+    // Temu also uses window.__UNIVERSAL_DATA__
+    const universalData = findGlobalVar('__UNIVERSAL_DATA__');
+    if (universalData) {
+      extractFromObject(universalData, data);
+    }
+
+    // Look for goodsProperty in window对象
+    const goodsProperty = findGlobalVar('goodsProperty');
+    if (goodsProperty) {
+      extractFromObject(goodsProperty, data);
+    }
+
+    // Scan all script tags for Temu-specific patterns
+    document.querySelectorAll('script').forEach(script => {
+      const text = script.textContent;
+      if (text.includes('fabric') || text.includes('material') || text.includes('polyester')) {
+        extractFromText(text, data);
+      }
+    });
+  }
+
+  function findGlobalVar(name) {
+    try {
+      if (window[name]) {
+        return typeof window[name] === 'string' ? JSON.parse(window[name]) : window[name];
+      }
+    } catch (e) {}
+    return null;
+  }
+
+  function extractFromObject(obj, data, depth = 0) {
+    if (depth > 10 || !obj || typeof obj !== 'object') return;
+
+    for (const [key, value] of Object.entries(obj)) {
+      const keyLower = key.toLowerCase();
+
+      if (value && typeof value === 'object') {
+        if (keyLower.includes('material') || keyLower.includes('fabric') || keyLower.includes('component')) {
+          if (typeof value === 'string') {
+            extractFromText(value, data);
+          } else {
+            extractFromObject(value, data, depth + 1);
+          }
+        } else {
+          extractFromObject(value, data, depth + 1);
+        }
+      } else if (typeof value === 'string') {
+        if (keyLower.includes('material') || keyLower.includes('fabric')) {
+          extractFromText(value, data);
+        }
+      }
+    }
   }
 
   function scanJsonLd(data) {
@@ -75,9 +154,7 @@
       try {
         const json = JSON.parse(script.textContent);
         processJsonLd(json, data);
-      } catch (e) {
-        // Invalid JSON, skip
-      }
+      } catch (e) {}
     });
   }
 
@@ -165,12 +242,9 @@
           const text = el.textContent || '';
           extractFromText(text, data);
         });
-      } catch (e) {
-        // Invalid selector, skip
-      }
+      } catch (e) {}
     });
 
-    // Scan text nodes
     const walker = document.createTreeWalker(
       document.body,
       NodeFilter.SHOW_TEXT,
@@ -208,9 +282,9 @@
 
     // Extract material
     if (!data.material) {
-      FABRIC_TYPES.forEach((name, keyword) => {
+      FABRIC_TYPES.forEach((info, keyword) => {
         if (text.toLowerCase().includes(keyword)) {
-          data.material = name;
+          data.material = info.name;
         }
       });
     }
@@ -247,9 +321,9 @@
     if (!value) return null;
     const str = String(value).toLowerCase();
 
-    for (const [keyword, name] of Object.entries(FABRIC_TYPES)) {
+    for (const [keyword, info] of Object.entries(FABRIC_TYPES)) {
       if (str.includes(keyword)) {
-        return name;
+        return info.name;
       }
     }
 
@@ -273,7 +347,77 @@
     return str.charAt(0).toUpperCase() + str.slice(1);
   }
 
-  function createRow(label, value) {
+  function calculateSeasonality(data) {
+    if (!data.material) return;
+
+    const fabricInfo = Object.values(FABRIC_TYPES).find(f => f.name === data.material);
+    if (!fabricInfo) return;
+
+    const breathability = fabricInfo.breathability;
+
+    if (breathability >= 4) {
+      data.seasonalRating = { label: 'Best for Summer', icon: '☀️', score: breathability };
+    } else if (breathability >= 2) {
+      data.seasonalRating = { label: 'All Seasons', icon: '🌍', score: breathability };
+    } else {
+      data.seasonalRating = { label: 'Best for Winter', icon: '❄️', score: breathability };
+    }
+  }
+
+  function generateWarning(data) {
+    if (!data.material) return;
+
+    const fabricInfo = Object.values(FABRIC_TYPES).find(f => f.name === data.material);
+    if (fabricInfo && fabricInfo.warning) {
+      data.warning = fabricInfo.warning;
+      data.sensitivity = fabricInfo.sensitivity;
+    }
+  }
+
+  function getProductUrl() {
+    return window.location.href;
+  }
+
+  function getProductTitle() {
+    // Try to find product title
+    const titleEl = document.querySelector('h1') || document.querySelector('[class*="title"]') || document.querySelector('title');
+    return titleEl ? titleEl.textContent.trim().substring(0, 100) : 'Unknown Product';
+  }
+
+  function saveToFavorites(data) {
+    const favorites = JSON.parse(localStorage.getItem('fabricFinder_favorites') || '[]');
+
+    const entry = {
+      url: getProductUrl(),
+      title: getProductTitle(),
+      material: data.material,
+      composition: data.composition,
+      stretch: data.stretch,
+      weave: data.weave,
+      season: data.season,
+      seasonalRating: data.seasonalRating,
+      warning: data.warning,
+      savedAt: new Date().toISOString()
+    };
+
+    // Avoid duplicates
+    const existingIndex = favorites.findIndex(f => f.url === entry.url);
+    if (existingIndex >= 0) {
+      favorites[existingIndex] = entry;
+    } else {
+      favorites.unshift(entry);
+    }
+
+    // Keep only last 50
+    if (favorites.length > 50) {
+      favorites.pop();
+    }
+
+    localStorage.setItem('fabricFinder_favorites', JSON.stringify(favorites));
+    return favorites.length;
+  }
+
+  function createRow(label, value, icon) {
     const row = document.createElement('div');
     row.className = 'fabric-finder-row';
 
@@ -283,7 +427,7 @@
 
     const valueSpan = document.createElement('span');
     valueSpan.className = 'fabric-finder-value';
-    valueSpan.textContent = value;
+    valueSpan.textContent = icon ? `${icon} ${value}` : value;
 
     row.appendChild(labelSpan);
     row.appendChild(valueSpan);
@@ -328,11 +472,42 @@
       content.appendChild(createRow('Fabric', data.stretch));
     }
     if (data.weave) {
-      content.appendChild(createRow('Weaving Method', data.weave));
+      content.appendChild(createRow('Weaving', data.weave));
+    }
+    if (data.seasonalRating) {
+      content.appendChild(createRow('Best For', data.seasonalRating.label, data.seasonalRating.icon));
     }
     if (data.season) {
       content.appendChild(createRow('Season', data.season));
     }
+
+    // Warning section
+    if (data.warning) {
+      const warningDiv = document.createElement('div');
+      warningDiv.className = 'fabric-finder-warning';
+      warningDiv.textContent = '⚠️ ' + data.warning;
+      content.appendChild(warningDiv);
+    }
+
+    // Action buttons
+    const actions = document.createElement('div');
+    actions.className = 'fabric-finder-actions';
+
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'fabric-finder-btn';
+    saveBtn.textContent = 'Save to Favorites';
+    saveBtn.addEventListener('click', () => {
+      const count = saveToFavorites(data);
+      saveBtn.textContent = 'Saved! ✓';
+      saveBtn.disabled = true;
+      setTimeout(() => {
+        saveBtn.textContent = 'Save to Favorites';
+        saveBtn.disabled = false;
+      }, 2000);
+    });
+
+    actions.appendChild(saveBtn);
+    content.appendChild(actions);
 
     widget.appendChild(header);
     widget.appendChild(content);
