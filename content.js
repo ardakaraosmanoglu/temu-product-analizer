@@ -74,9 +74,19 @@
     },
 
     init() {
-      // Detect language from browser
+      // Priority: 1) localStorage override, 2) Country-based (Cyprus=TR), 3) Browser language
+      const savedLang = localStorage.getItem('fabricFinder_lang');
+      if (savedLang) {
+        this.currentLang = savedLang;
+        return;
+      }
       const browserLang = navigator.language.toLowerCase();
-      this.currentLang = browserLang.startsWith('tr') ? 'tr' : 'en';
+      // Cyprus users default to Turkish
+      if (browserLang.startsWith('tr') || browserLang.startsWith('cy')) {
+        this.currentLang = 'tr';
+      } else {
+        this.currentLang = 'en';
+      }
     },
 
     t(key, params) {
