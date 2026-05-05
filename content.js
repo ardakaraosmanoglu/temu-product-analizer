@@ -713,14 +713,134 @@
     });
   }
 
-  // Country-specific season recommendations
+  // Country-specific climate data with temperature ranges
   const COUNTRY_CLIMATES = {
-    CY: { name: 'Cyprus', nameTr: 'Kıbrıs', summer: 'extreme', winter: 'mild' },
-    TR: { name: 'Turkey', nameTr: 'Türkiye', summer: 'hot', winter: 'cold' },
-    DE: { name: 'Germany', nameTr: 'Almanya', summer: 'mild', winter: 'cold' },
-    GB: { name: 'UK', nameTr: 'İngiltere', summer: 'mild', winter: 'cold' },
-    FR: { name: 'France', nameTr: 'Fransa', summer: 'warm', winter: 'cold' },
-    US: { name: 'USA', nameTr: 'ABD', summer: 'varies', winter: 'varies' }
+    CY: {
+      name: 'Cyprus', nameTr: 'Kıbrıs', region: 'Eastern Mediterranean',
+      summerTemp: { min: 18, max: 37 }, winterTemp: { min: 5, max: 20 },
+      summerType: 'extreme', winterType: 'mild',
+      bestMonths: 'Apr-May, Sep-Oct'
+    },
+    TR: {
+      name: 'Turkey', nameTr: 'Türkiye', region: 'Western Asia / Europe',
+      summerTemp: { min: 18, max: 35 }, winterTemp: { min: 0, max: 12 },
+      summerType: 'hot', winterType: 'cold',
+      bestMonths: 'Apr-Jun, Sep-Oct'
+    },
+    DE: {
+      name: 'Germany', nameTr: 'Almanya', region: 'Central Europe',
+      summerTemp: { min: 13, max: 24 }, winterTemp: { min: 0, max: 5 },
+      summerType: 'mild', winterType: 'cold',
+      bestMonths: 'May-Sep'
+    },
+    GB: {
+      name: 'United Kingdom', nameTr: 'İngiltere', region: 'Northern Europe',
+      summerTemp: { min: 12, max: 23 }, winterTemp: { min: 1, max: 8 },
+      summerType: 'mild', winterType: 'cold',
+      bestMonths: 'May-Sep'
+    },
+    FR: {
+      name: 'France', nameTr: 'Fransa', region: 'Western Europe',
+      summerTemp: { min: 15, max: 30 }, winterTemp: { min: 2, max: 10 },
+      summerType: 'warm', winterType: 'cold',
+      bestMonths: 'May-Jun, Sep'
+    },
+    IT: {
+      name: 'Italy', nameTr: 'İtalya', region: 'Southern Europe',
+      summerTemp: { min: 18, max: 32 }, winterTemp: { min: 0, max: 12 },
+      summerType: 'hot', winterType: 'cold',
+      bestMonths: 'Apr-Jun, Sep-Oct'
+    },
+    ES: {
+      name: 'Spain', nameTr: 'İspanya', region: 'Southern Europe',
+      summerTemp: { min: 18, max: 33 }, winterTemp: { min: 5, max: 14 },
+      summerType: 'hot', winterType: 'mild',
+      bestMonths: 'Apr-Jun, Sep-Oct'
+    },
+    GR: {
+      name: 'Greece', nameTr: 'Yunanistan', region: 'Southern Europe',
+      summerTemp: { min: 20, max: 32 }, winterTemp: { min: 5, max: 15 },
+      summerType: 'hot', winterType: 'mild',
+      bestMonths: 'Apr-Jun, Sep'
+    },
+    NL: {
+      name: 'Netherlands', nameTr: 'Hollanda', region: 'Western Europe',
+      summerTemp: { min: 13, max: 22 }, winterTemp: { min: 1, max: 7 },
+      summerType: 'mild', winterType: 'cold',
+      bestMonths: 'Late Apr-Sep'
+    },
+    BE: {
+      name: 'Belgium', nameTr: 'Belçika', region: 'Western Europe',
+      summerTemp: { min: 14, max: 23 }, winterTemp: { min: 1, max: 7 },
+      summerType: 'mild', winterType: 'cold',
+      bestMonths: 'May-Sep'
+    },
+    AT: {
+      name: 'Austria', nameTr: 'Avusturya', region: 'Central Europe',
+      summerTemp: { min: 12, max: 25 }, winterTemp: { min: -5, max: 4 },
+      summerType: 'warm', winterType: 'cold',
+      bestMonths: 'May-Sep'
+    },
+    CH: {
+      name: 'Switzerland', nameTr: 'İsviçre', region: 'Central Europe',
+      summerTemp: { min: 11, max: 24 }, winterTemp: { min: -4, max: 5 },
+      summerType: 'mild', winterType: 'cold',
+      bestMonths: 'Jun-Sep'
+    },
+    PT: {
+      name: 'Portugal', nameTr: 'Portekiz', region: 'Southern Europe',
+      summerTemp: { min: 17, max: 30 }, winterTemp: { min: 5, max: 16 },
+      summerType: 'warm', winterType: 'mild',
+      bestMonths: 'Apr-Jun, Sep-Oct'
+    },
+    PL: {
+      name: 'Poland', nameTr: 'Polonya', region: 'Central Europe',
+      summerTemp: { min: 14, max: 25 }, winterTemp: { min: -6, max: 0 },
+      summerType: 'warm', winterType: 'cold',
+      bestMonths: 'May-Sep'
+    },
+    CZ: {
+      name: 'Czech Republic', nameTr: 'Çekya', region: 'Central Europe',
+      summerTemp: { min: 14, max: 25 }, winterTemp: { min: -6, max: 0 },
+      summerType: 'warm', winterType: 'cold',
+      bestMonths: 'May-Sep'
+    },
+    SE: {
+      name: 'Sweden', nameTr: 'İsveç', region: 'Northern Europe',
+      summerTemp: { min: 10, max: 22 }, winterTemp: { min: -8, max: 1 },
+      summerType: 'mild', winterType: 'cold',
+      bestMonths: 'Jun-Aug'
+    },
+    NO: {
+      name: 'Norway', nameTr: 'Norveç', region: 'Northern Europe',
+      summerTemp: { min: 10, max: 20 }, winterTemp: { min: -8, max: 2 },
+      summerType: 'mild', winterType: 'cold',
+      bestMonths: 'Jun-Aug'
+    },
+    DK: {
+      name: 'Denmark', nameTr: 'Danimarka', region: 'Northern Europe',
+      summerTemp: { min: 13, max: 22 }, winterTemp: { min: 0, max: 5 },
+      summerType: 'mild', winterType: 'cold',
+      bestMonths: 'May-Aug'
+    },
+    FI: {
+      name: 'Finland', nameTr: 'Finlandiya', region: 'Northern Europe',
+      summerTemp: { min: 11, max: 22 }, winterTemp: { min: -12, max: -1 },
+      summerType: 'mild', winterType: 'cold',
+      bestMonths: 'Jun-Aug'
+    },
+    IE: {
+      name: 'Ireland', nameTr: 'İrlanda', region: 'Northern Europe',
+      summerTemp: { min: 11, max: 20 }, winterTemp: { min: 2, max: 8 },
+      summerType: 'mild', winterType: 'cold',
+      bestMonths: 'May-Sep'
+    },
+    US: {
+      name: 'USA', nameTr: 'ABD', region: 'North America',
+      summerTemp: { min: 15, max: 35 }, winterTemp: { min: -10, max: 15 },
+      summerType: 'varies', winterType: 'varies',
+      bestMonths: 'May-Sep (varies by region)'
+    }
   };
 
   // Get selected country (default: Cyprus)
@@ -893,11 +1013,9 @@
     const breathability = fabricInfo.breathability;
     const warmth = fabricInfo.warmth;
 
-    // Country-specific season recommendations
-    const countryName = I18N.currentLang === 'tr' ? country.nameTr : country.name;
-
-    if (country.summer === 'extreme') {
-      // Cyprus - very hot summers, mild winters
+    // Country-specific season recommendations based on climate type
+    if (country.summerType === 'extreme') {
+      // Cyprus - very hot summers (18-37°C), mild winters (5-20°C)
       if (breathability >= 4.5) {
         data.seasonalRating = { label: `☀️ ${I18N.currentLang === 'tr' ? 'Yaz Mükemmel' : 'Perfect for Summer'}`, icon: '☀️', score: breathability };
       } else if (breathability >= 3) {
@@ -907,8 +1025,8 @@
       } else {
         data.seasonalRating = { label: `❄️ ${I18N.currentLang === 'tr' ? 'Kış İçin' : 'For Winter'}`, icon: '❄️', score: breathability };
       }
-    } else if (country.summer === 'hot') {
-      // Turkey - hot summers, cold winters
+    } else if (country.summerType === 'hot') {
+      // Turkey, Italy, Spain - hot summers, cold winters
       if (breathability >= 4) {
         data.seasonalRating = { label: I18N.t('bestForSummer'), icon: '☀️', score: breathability };
       } else if (breathability >= 2) {
@@ -916,23 +1034,23 @@
       } else {
         data.seasonalRating = { label: I18N.t('bestForWinter'), icon: '❄️', score: breathability };
       }
-    } else if (country.summer === 'mild') {
-      // Germany, UK - mild summers, cold winters
-      if (warmth >= 4) {
-        data.seasonalRating = { label: `❄️ ${I18N.currentLang === 'tr' ? 'Kış Mükemmel' : 'Perfect for Winter'}`, icon: '❄️', score: breathability };
-      } else if (breathability >= 3) {
-        data.seasonalRating = { label: I18N.t('bestForSummer'), icon: '☀️', score: breathability };
-      } else {
-        data.seasonalRating = { label: `🌤️ ${I18N.currentLang === 'tr' ? 'Geçiş' : 'Transition'}`, icon: '🌤️', score: breathability };
-      }
-    } else if (country.summer === 'warm') {
-      // France - warm summers, cold winters
+    } else if (country.summerType === 'warm') {
+      // France, Austria, Poland, Czech - warm summers, cold winters
       if (breathability >= 4) {
         data.seasonalRating = { label: I18N.t('bestForSummer'), icon: '☀️', score: breathability };
       } else if (warmth >= 4) {
         data.seasonalRating = { label: I18N.t('bestForWinter'), icon: '❄️', score: breathability };
       } else {
         data.seasonalRating = { label: I18N.t('allSeasons'), icon: '🌍', score: breathability };
+      }
+    } else if (country.summerType === 'mild') {
+      // Germany, UK, Netherlands, Belgium, Sweden, Norway, Denmark, Finland, Ireland - mild/cold
+      if (warmth >= 4) {
+        data.seasonalRating = { label: `❄️ ${I18N.currentLang === 'tr' ? 'Kış Mükemmel' : 'Perfect for Winter'}`, icon: '❄️', score: breathability };
+      } else if (breathability >= 3) {
+        data.seasonalRating = { label: I18N.t('bestForSummer'), icon: '☀️', score: breathability };
+      } else {
+        data.seasonalRating = { label: `🌤️ ${I18N.currentLang === 'tr' ? 'Geçiş' : 'Transition'}`, icon: '🌤️', score: breathability };
       }
     } else {
       // USA and others - generic fallback
