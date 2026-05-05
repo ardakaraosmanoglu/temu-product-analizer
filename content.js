@@ -611,7 +611,7 @@
 
     // Extract material
     if (!data.material) {
-      FABRIC_TYPES.forEach((info, keyword) => {
+      Object.entries(FABRIC_TYPES).forEach(([keyword, info]) => {
         if (text.toLowerCase().includes(keyword)) {
           data.material = info.name[I18N.currentLang] || info.name.en;
         }
