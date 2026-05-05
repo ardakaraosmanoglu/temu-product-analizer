@@ -931,53 +931,6 @@
 
   function extractFromText(text, data) {
     // This function is now deprecated - all extraction happens in scanVisibleContent
-    // Kept for backwards compatibility with any direct callers
-  }
-
-    // Extract material
-    if (!data.material) {
-      Object.entries(FABRIC_TYPES).forEach(([keyword, info]) => {
-        if (text.toLowerCase().includes(keyword)) {
-          data.material = info.name[I18N.currentLang] || info.name.en;
-        }
-      });
-    }
-
-    // Extract season
-    if (!data.season) {
-      Object.entries(SEASON_KEYWORDS).forEach(([season, keywords]) => {
-        const langKeywords = keywords[I18N.currentLang] || keywords.en;
-        langKeywords.forEach(keyword => {
-          if (text.toLowerCase().includes(keyword)) {
-            if (season === 'allSeason') {
-              data.season = I18N.t('allSeasons');
-            } else {
-              data.season = capitalizeFirstLetter(keyword);
-            }
-          }
-        });
-      });
-    }
-
-    // Extract stretch
-    if (!data.stretch) {
-      STRETCH_KEYWORDS.forEach(keyword => {
-        if (text.toLowerCase().includes(keyword)) {
-          data.stretch = I18N.t('stretchFabric');
-        }
-      });
-    }
-
-    // Extract weave method
-    if (!data.weave) {
-      Object.entries(WEAVE_TYPES).forEach(([keyword, weaveInfo]) => {
-        if (text.toLowerCase().includes(keyword)) {
-          data.weave = weaveInfo.name[I18N.currentLang] || weaveInfo.name.en;
-          data.weavePros = weaveInfo.pros[I18N.currentLang] || weaveInfo.pros.en;
-          data.weaveCons = weaveInfo.cons[I18N.currentLang] || weaveInfo.cons.en;
-        }
-      });
-    }
   }
 
   function extractFabricValue(value) {
