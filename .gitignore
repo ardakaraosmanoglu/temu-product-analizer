@@ -58,5 +58,7 @@ env/
 *.json
 !package.json
 !composer.json
+!manifest.json
 results/
 data/
+/.omc
