@@ -713,55 +713,106 @@
     });
   }
 
+  // Country-specific season recommendations
+  const COUNTRY_CLIMATES = {
+    CY: { name: 'Cyprus', nameTr: 'Kıbrıs', summer: 'extreme', winter: 'mild' },
+    TR: { name: 'Turkey', nameTr: 'Türkiye', summer: 'hot', winter: 'cold' },
+    DE: { name: 'Germany', nameTr: 'Almanya', summer: 'mild', winter: 'cold' },
+    GB: { name: 'UK', nameTr: 'İngiltere', summer: 'mild', winter: 'cold' },
+    FR: { name: 'France', nameTr: 'Fransa', summer: 'warm', winter: 'cold' },
+    US: { name: 'USA', nameTr: 'ABD', summer: 'varies', winter: 'varies' }
+  };
+
+  // Get selected country (default: Cyprus)
+  function getSelectedCountry() {
+    return localStorage.getItem('fabricFinder_country') || 'CY';
+  }
+
   function scanVisibleContent(data) {
+    // Only scan specific product-related elements (NOT entire page)
     const selectors = [
       '[class*="material"]', '[class*="fabric"]', '[class*="composition"]',
       '[class*="detail"]', '[class*="spec"]', '[class*="product"]',
       '[id*="material"]', '[id*="fabric"]', '[id*="detail"]',
-      '[data-testid*="material"]', '[data-testid*="fabric"]'
+      '[data-testid*="material"]', '[data-testid*="fabric"]',
+      '[class*="attr"]', '[class*="property"]', '[class*="info"]'
     ];
+
+    const foundMaterials = new Set();
+    const foundCompositions = new Set();
 
     selectors.forEach(selector => {
       try {
         document.querySelectorAll(selector).forEach(el => {
-          extractFromText(el.textContent || '', data);
+          const text = el.textContent || '';
+          // Skip if text is too long (likely script/json, not real content)
+          if (text.length > 500) return;
+
+          // Extract material
+          Object.entries(FABRIC_TYPES).forEach(([keyword, info]) => {
+            if (text.toLowerCase().includes(keyword) && !data.material) {
+              data.material = info.name[I18N.currentLang] || info.name.en;
+            }
+            // Extract composition (with percentage for accuracy)
+            const compRegex = new RegExp(`(\\d+\\s*%\\s*${keyword})`, 'gi');
+            const compMatches = text.match(compRegex);
+            if (compMatches) {
+              compMatches.forEach(m => foundCompositions.add(m.toLowerCase()));
+            }
+          });
+
+          // Extract season
+          if (!data.season) {
+            Object.entries(SEASON_KEYWORDS).forEach(([season, keywords]) => {
+              const langKeywords = keywords[I18N.currentLang] || keywords.en;
+              langKeywords.forEach(keyword => {
+                if (text.toLowerCase().includes(keyword)) {
+                  if (season === 'allSeason') {
+                    data.season = I18N.t('allSeasons');
+                  } else {
+                    data.season = capitalizeFirstLetter(keyword);
+                  }
+                }
+              });
+            });
+          }
+
+          // Extract stretch
+          if (!data.stretch) {
+            STRETCH_KEYWORDS.forEach(keyword => {
+              if (text.toLowerCase().includes(keyword)) {
+                data.stretch = I18N.t('stretchFabric');
+              }
+            });
+          }
+
+          // Extract weave
+          if (!data.weave) {
+            Object.entries(WEAVE_TYPES).forEach(([keyword, weaveInfo]) => {
+              if (text.toLowerCase().includes(keyword)) {
+                data.weave = weaveInfo.name[I18N.currentLang] || weaveInfo.name.en;
+                data.weavePros = weaveInfo.pros[I18N.currentLang] || weaveInfo.pros.en;
+                data.weaveCons = weaveInfo.cons[I18N.currentLang] || weaveInfo.cons.en;
+              }
+            });
+          }
         });
       } catch (e) {}
     });
 
-    const walker = document.createTreeWalker(
-      document.body,
-      NodeFilter.SHOW_TEXT,
-      {
-        acceptNode: function(node) {
-          const text = node.textContent || '';
-          if (FABRIC_KEYWORDS.some(k => text.toLowerCase().includes(k))) {
-            return NodeFilter.FILTER_ACCEPT;
-          }
-          return NodeFilter.FILTER_SKIP;
-        }
-      }
-    );
-
-    const textNodes = [];
-    let node;
-    while (node = walker.nextNode()) {
-      textNodes.push(node.textContent);
+    // Set deduplicated composition (max 5 items)
+    if (foundCompositions.size > 0) {
+      const uniqueComps = [...foundCompositions]
+        .slice(0, 5)
+        .map(m => capitalizeFirstLetter(m));
+      data.composition = uniqueComps.join(', ');
     }
-
-    textNodes.forEach(text => extractFromText(text, data));
   }
 
   function extractFromText(text, data) {
-    const compositionRegex = /(\d+\s*%\s*)?(polyester|cotton|wool|silk|linen|nylon|spandex|elastane|viscose|rayon|acrylic|modal|tencel|velvet|fleece|satin|microfiber|polyamide)/gi;
-    const matches = text.match(compositionRegex);
-
-    if (matches && !data.composition) {
-      const composition = matches.map(m => m.trim()).join(', ');
-      if (composition.length > 2) {
-        data.composition = capitalizeFirstLetter(composition);
-      }
-    }
+    // This function is now deprecated - all extraction happens in scanVisibleContent
+    // Kept for backwards compatibility with any direct callers
+  }
 
     // Extract material
     if (!data.material) {
@@ -838,14 +889,60 @@
       f.name[I18N.currentLang] === data.material || f.name.en === data.material);
     if (!fabricInfo) return;
 
+    const country = COUNTRY_CLIMATES[getSelectedCountry()];
     const breathability = fabricInfo.breathability;
+    const warmth = fabricInfo.warmth;
 
-    if (breathability >= 4) {
-      data.seasonalRating = { label: I18N.t('bestForSummer'), icon: '☀️', score: breathability };
-    } else if (breathability >= 2) {
-      data.seasonalRating = { label: I18N.t('allSeasons'), icon: '🌍', score: breathability };
+    // Country-specific season recommendations
+    const countryName = I18N.currentLang === 'tr' ? country.nameTr : country.name;
+
+    if (country.summer === 'extreme') {
+      // Cyprus - very hot summers, mild winters
+      if (breathability >= 4.5) {
+        data.seasonalRating = { label: `☀️ ${I18N.currentLang === 'tr' ? 'Yaz Mükemmel' : 'Perfect for Summer'}`, icon: '☀️', score: breathability };
+      } else if (breathability >= 3) {
+        data.seasonalRating = { label: `🌤️ ${I18N.currentLang === 'tr' ? 'Geçiş Ideal' : 'Good for Transitions'}`, icon: '🌤️', score: breathability };
+      } else if (breathability >= 2) {
+        data.seasonalRating = { label: `🌡️ ${I18N.currentLang === 'tr' ? 'Serin Tutabilir' : 'Can Keep Cool'}`, icon: '🌡️', score: breathability };
+      } else {
+        data.seasonalRating = { label: `❄️ ${I18N.currentLang === 'tr' ? 'Kış İçin' : 'For Winter'}`, icon: '❄️', score: breathability };
+      }
+    } else if (country.summer === 'hot') {
+      // Turkey - hot summers, cold winters
+      if (breathability >= 4) {
+        data.seasonalRating = { label: I18N.t('bestForSummer'), icon: '☀️', score: breathability };
+      } else if (breathability >= 2) {
+        data.seasonalRating = { label: `🌤️ ${I18N.currentLang === 'tr' ? 'Geçiş' : 'Transition'}`, icon: '🌤️', score: breathability };
+      } else {
+        data.seasonalRating = { label: I18N.t('bestForWinter'), icon: '❄️', score: breathability };
+      }
+    } else if (country.summer === 'mild') {
+      // Germany, UK - mild summers, cold winters
+      if (warmth >= 4) {
+        data.seasonalRating = { label: `❄️ ${I18N.currentLang === 'tr' ? 'Kış Mükemmel' : 'Perfect for Winter'}`, icon: '❄️', score: breathability };
+      } else if (breathability >= 3) {
+        data.seasonalRating = { label: I18N.t('bestForSummer'), icon: '☀️', score: breathability };
+      } else {
+        data.seasonalRating = { label: `🌤️ ${I18N.currentLang === 'tr' ? 'Geçiş' : 'Transition'}`, icon: '🌤️', score: breathability };
+      }
+    } else if (country.summer === 'warm') {
+      // France - warm summers, cold winters
+      if (breathability >= 4) {
+        data.seasonalRating = { label: I18N.t('bestForSummer'), icon: '☀️', score: breathability };
+      } else if (warmth >= 4) {
+        data.seasonalRating = { label: I18N.t('bestForWinter'), icon: '❄️', score: breathability };
+      } else {
+        data.seasonalRating = { label: I18N.t('allSeasons'), icon: '🌍', score: breathability };
+      }
     } else {
-      data.seasonalRating = { label: I18N.t('bestForWinter'), icon: '❄️', score: breathability };
+      // USA and others - generic fallback
+      if (breathability >= 4) {
+        data.seasonalRating = { label: I18N.t('bestForSummer'), icon: '☀️', score: breathability };
+      } else if (breathability >= 2) {
+        data.seasonalRating = { label: I18N.t('allSeasons'), icon: '🌍', score: breathability };
+      } else {
+        data.seasonalRating = { label: I18N.t('bestForWinter'), icon: '❄️', score: breathability };
+      }
     }
   }
 
