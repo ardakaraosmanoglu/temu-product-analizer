@@ -229,6 +229,7 @@
 
   <div class="tabs">
     <button class="tab active" data-tab="info">Info</button>
+    <button class="tab" data-tab="settings">Settings</button>
     <button class="tab" data-tab="favorites">Favorites</button>
   </div>
 
@@ -248,10 +249,48 @@
       <h3>Features</h3>
       <ul>
         <li>Fabric material detection</li>
-        <li>Seasonal recommendation</li>
+        <li>Country-specific seasons</li>
         <li>Allergy warnings</li>
-        <li>Save to favorites</li>
+        <li>Quality grades</li>
       </ul>
+    </div>
+  </div>
+
+  <div id="tab-settings" class="tab-content">
+    <div class="info">
+      <h3>Country Selection</h3>
+      <p style="font-size: 10px; color: #888; margin-bottom: 8px;">Select your country for accurate season recommendations</p>
+      <select id="country-select" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-size: 12px;">
+        <option value="CY">🇨🇾 Cyprus / Kıbrıs</option>
+        <option value="TR">🇹🇷 Turkey / Türkiye</option>
+        <option value="DE">🇩🇪 Germany / Almanya</option>
+        <option value="GB">🇬🇧 United Kingdom / İngiltere</option>
+        <option value="FR">🇫🇷 France / Fransa</option>
+        <option value="IT">🇮🇹 Italy / İtalya</option>
+        <option value="ES">🇪🇸 Spain / İspanya</option>
+        <option value="GR">🇬🇷 Greece / Yunanistan</option>
+        <option value="PT">🇵🇹 Portugal</option>
+        <option value="NL">🇳🇱 Netherlands / Hollanda</option>
+        <option value="BE">🇧🇪 Belgium / Belçika</option>
+        <option value="AT">🇦🇹 Austria / Avusturya</option>
+        <option value="CH">🇨🇭 Switzerland / İsviçre</option>
+        <option value="PL">🇵🇱 Poland / Polonya</option>
+        <option value="CZ">🇨🇿 Czech Republic / Çekya</option>
+        <option value="SE">🇸🇪 Sweden / İsveç</option>
+        <option value="NO">🇳🇴 Norway / Norveç</option>
+        <option value="DK">🇩🇰 Denmark / Danimarka</option>
+        <option value="FI">🇫🇮 Finland / Finlandiya</option>
+        <option value="IE">🇮🇪 Ireland / İrlanda</option>
+        <option value="US">🇺🇸 USA</option>
+      </select>
+    </div>
+
+    <div class="info">
+      <h3>Language</h3>
+      <select id="lang-select" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-size: 12px;">
+        <option value="tr">Türkçe</option>
+        <option value="en">English</option>
+      </select>
     </div>
   </div>
 

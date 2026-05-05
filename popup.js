@@ -9,6 +9,29 @@ document.addEventListener('DOMContentLoaded', function() {
   const clearAllBtn = document.getElementById('clear-all');
   const tabs = document.querySelectorAll('.tab');
   const tabContents = document.querySelectorAll('.tab-content');
+  const countrySelect = document.getElementById('country-select');
+  const langSelect = document.getElementById('lang-select');
+
+  // Load saved settings
+  const savedCountry = localStorage.getItem('fabricFinder_country') || 'CY';
+  const savedLang = localStorage.getItem('fabricFinder_lang') || 'tr';
+
+  if (countrySelect) countrySelect.value = savedCountry;
+  if (langSelect) langSelect.value = savedLang;
+
+  // Country selection handler
+  if (countrySelect) {
+    countrySelect.addEventListener('change', function() {
+      localStorage.setItem('fabricFinder_country', this.value);
+    });
+  }
+
+  // Language selection handler
+  if (langSelect) {
+    langSelect.addEventListener('change', function() {
+      localStorage.setItem('fabricFinder_lang', this.value);
+    });
+  }
 
   // Check current tab and update status
   chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
