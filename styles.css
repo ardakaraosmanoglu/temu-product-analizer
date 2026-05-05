@@ -106,16 +106,35 @@
   color: #d32f2f;
 }
 
-/* Explanation tooltip */
-.fabric-finder-explanation {
-  margin-top: 10px;
+/* Pros/Cons table */
+.fabric-finder-proscons {
+  margin-top: 12px;
   padding: 10px 12px;
-  background: #e3f2fd;
+  background: #f8f9fa;
   border-radius: 8px;
-  border-left: 3px solid #2196f3;
   font-size: 11px;
-  color: #1565c0;
-  line-height: 1.5;
+}
+
+.proscons-title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.pros-list, .cons-list {
+  margin: 4px 0;
+}
+
+.pros-item {
+  color: #2e7d32;
+  padding: 2px 0 2px 8px;
+}
+
+.cons-item {
+  color: #c62828;
+  padding: 2px 0 2px 8px;
 }
 
 /* Warning section */

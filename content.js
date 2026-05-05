@@ -108,150 +108,304 @@
       name: { en: 'Polyester', tr: 'Polyester' },
       breathability: 2, warmth: 3, durability: 4,
       sensitivity: 'medium',
-      warning: { en: 'Synthetic fabric with low breathability', tr: 'Düşük hava geçirgenliğine sahip sentetik kumaş' },
-      explanation: { en: 'Durable synthetic fiber, quick-drying but less breathable. Common in budget clothing.', tr: 'Dayanıklı sentetik lif, çabuk kurur ancak az hava geçirgen. Bütçe giyimde yaygın.' }
+      warning: { en: 'Synthetic fabric with low breathability', tr: 'Az hava geçirgenliği' },
+      pros: {
+        en: ['Dayanıklı', 'Çabuk kurur', 'Kolay ütülenir', 'Ucuz'],
+        tr: ['Dayanıklı', 'Çabuk kurur', 'Kolay ütülenir', 'Ucuz']
+      },
+      cons: {
+        en: ['Az nefes alır', 'Kötü koku alır', 'Statik yapar', 'Çevre dostu değil'],
+        tr: ['Az nefes alır', 'Kötü koku alır', 'Statik yapar', 'Çevre dostu değil']
+      }
     },
     'cotton': {
       name: { en: 'Cotton', tr: 'Pamuk' },
       breathability: 5, warmth: 3, durability: 3,
       sensitivity: 'low',
       warning: { en: null, tr: null },
-      explanation: { en: 'Natural breathable fiber, soft and comfortable. Good for sensitive skin.', tr: 'Doğal nefes alan lif, yumuşak ve konforlu. Hassas ciltler için iyi.' }
+      pros: {
+        en: ['Nefes alır', 'Yumuşak', 'Ter emici', 'Cilt dostu', 'Doğal'],
+        tr: ['Nefes alır', 'Yumuşak', 'Ter emici', 'Cilt dostu', 'Doğal']
+      },
+      cons: {
+        en: ['Çabuk kırışır', 'Geç kurur', 'Düşük dayanım', 'Çeker'],
+        tr: ['Çabuk kırışır', 'Geç kurur', 'Düşük dayanım', 'Çeker']
+      }
     },
     'wool': {
       name: { en: 'Wool', tr: 'Yün' },
       breathability: 3, warmth: 5, durability: 3,
       sensitivity: 'medium',
-      warning: { en: 'May cause irritation for sensitive skin', tr: 'Hassas ciltlerde tahrişe neden olabilir' },
-      explanation: { en: 'Natural insulator, excellent for cold weather. Natural moisture-wicking.', tr: 'Doğal yalıtkan, soğuk hava için mükemmel. Doğal nem alma özelliği.' }
+      warning: { en: 'May irritate sensitive skin', tr: 'Hassas ciltlerde tahriş edebilir' },
+      pros: {
+        en: ['Sıcak tutar', 'Doğal yalıtkan', 'Nem alır', 'Kötü koku yapmaz'],
+        tr: ['Sıcak tutar', 'Doğal yalıtkan', 'Nem alır', 'Kötü koku yapmaz']
+      },
+      cons: {
+        en: ['Kaşındırabilir', 'Tüylenebilir', 'Elégi dikkatli bakım', 'Pahalı'],
+        tr: ['Kaşındırabilir', 'Tüylenebilir', 'Dikkatli bakım gerekli', 'Pahalı']
+      }
     },
     'silk': {
       name: { en: 'Silk', tr: 'İpek' },
       breathability: 4, warmth: 2, durability: 2,
       sensitivity: 'low',
       warning: { en: null, tr: null },
-      explanation: { en: 'Luxurious natural fiber with smooth texture. Temperature regulating.', tr: 'Düzgün dokuya sahip lüks doğal lif. Sıcaklık düzenleyici.' }
+      pros: {
+        en: ['Lüks his', 'Sıcaklık düzenler', 'Parıltılı görünüm', 'Hafif'],
+        tr: ['Lüks his', 'Sıcaklık düzenler', 'Parıltılı görünüm', 'Hafif']
+      },
+      cons: {
+        en: ['Çok hassas', 'Pahalı', 'El dikimi gerekli', 'Statik yapar'],
+        tr: ['Çok hassas', 'Pahalı', 'El dikimi gerekli', 'Statik yapar']
+      }
     },
     'linen': {
       name: { en: 'Linen', tr: 'Keten' },
       breathability: 5, warmth: 2, durability: 3,
       sensitivity: 'low',
       warning: { en: null, tr: null },
-      explanation: { en: 'Lightweight natural fiber, excellent for hot weather. Gets softer with washing.', tr: 'Hafif doğal lif, sıcak hava için mükemmel. Yıkandıkça yumuşar.' }
+      pros: {
+        en: ['Mükemmel nefes alır', 'Sıcak hava ideal', 'Doğal', 'Yıkandıkça yumuşar'],
+        tr: ['Mükemmel nefes alır', 'Sıcak hava ideal', 'Doğal', 'Yıkandıkça yumuşar']
+      },
+      cons: {
+        en: ['Kolay kırışır', 'Çeker', 'Sert olabilir başlangıçta'],
+        tr: ['Kolay kırışır', 'Çeker', 'Başlangıçta sert olabilir']
+      }
     },
     'nylon': {
       name: { en: 'Nylon', tr: 'Naylon' },
       breathability: 3, warmth: 3, durability: 5,
       sensitivity: 'medium',
       warning: { en: 'Synthetic fabric', tr: 'Sentetik kumaş' },
-      explanation: { en: 'Strong synthetic, resistant to tears and abrasion. Often used in activewear.', tr: 'Güçlü sentetik, yırtılmaya ve aşınmaya dayanıklı. Genellikle spor giyimde kullanılır.' }
+      pros: {
+        en: ['Çok dayanıklı', 'Hafif', 'Çabuk kurur', 'Kolor tutar'],
+        tr: ['Çok dayanıklı', 'Hafif', 'Çabuk kurur', 'Renk tutar']
+      },
+      cons: {
+        en: ['Az nefes alır', 'Statik yapar', 'Sıcak tutabilir'],
+        tr: ['Az nefes alır', 'Statik yapar', 'Sıcak tutabilir']
+      }
     },
     'spandex': {
       name: { en: 'Spandex', tr: 'Spanks' },
       breathability: 3, warmth: 2, durability: 3,
       sensitivity: 'medium',
       warning: { en: 'Synthetic blend', tr: 'Sentetik karışım' },
-      explanation: { en: 'Highly elastic fiber, provides stretch and flexibility. Common in leggings and sportswear.', tr: 'Yüksek esnek lif, esneklik sağlar. Tayt ve spor giyimde yaygın.' }
+      pros: {
+        en: ['Yüksek esneklik', 'Forma uyum', 'Hafif', 'Hızlı kurur'],
+        tr: ['Yüksek esneklik', 'Forma uyum', 'Hafif', 'Hızlı kurur']
+      },
+      cons: {
+        en: ['Az nefes alır', 'Ter kokusu yapar', 'Bakımı zor'],
+        tr: ['Az nefes alır', 'Ter kokusu yapar', 'Bakımı zor']
+      }
     },
     'elastane': {
       name: { en: 'Elastane', tr: 'Elastan' },
       breathability: 3, warmth: 2, durability: 3,
       sensitivity: 'medium',
       warning: { en: 'Synthetic blend', tr: 'Sentetik karışım' },
-      explanation: { en: 'Elastic fiber similar to spandex. Provides shape retention.', tr: 'Spanks benzeri esnek lif. Form koruma sağlar.' }
+      pros: {
+        en: ['Esnek', 'Form koruyucu', 'Rahatsız etmez'],
+        tr: ['Esnek', 'Form koruyucu', 'Rahatsız etmez']
+      },
+      cons: {
+        en: ['Sentetik', 'Sıcak tutar', 'Klor zarar verir'],
+        tr: ['Sentetik', 'Sıcak tutar', 'Klor zarar verir']
+      }
     },
     'viscose': {
       name: { en: 'Viscose', tr: 'Viskoz' },
       breathability: 4, warmth: 2, durability: 2,
       sensitivity: 'low',
       warning: { en: null, tr: null },
-      explanation: { en: 'Semi-synthetic fiber from wood pulp. Soft drape, breathable.', tr: 'Odun selülozundan elde edilen yarı sentetik lif. Yumuşak akış, nefes alan.' }
+      pros: {
+        en: ['İpek gibi yumuşak', 'Nefes alır', 'Akışkan', 'Uygun fiyat'],
+        tr: ['İpek gibi yumuşak', 'Nefes alır', 'Akışkan', 'Uygun fiyat']
+      },
+      cons: {
+        en: ['Islakken zayıf', 'Çabuk kırışır', 'Dikkatli yıkama gerekli'],
+        tr: ['Islakken zayıf', 'Çabuk kırışır', 'Dikkatli yıkama gerekli']
+      }
     },
     'rayon': {
       name: { en: 'Rayon', tr: 'Rayon' },
       breathability: 4, warmth: 2, durability: 2,
       sensitivity: 'low',
       warning: { en: null, tr: null },
-      explanation: { en: 'Semi-synthetic, silky feel. Good drape but weaker when wet.', tr: 'Yarı sentetik, ipek gibi his. İyi akış ancak ıslakken zayıf.' }
+      pros: {
+        en: ['İpek hissi', 'Nefes alır', 'Parlak görünüm', 'Ucuz'],
+        tr: ['İpek hissi', 'Nefes alır', 'Parlak görünüm', 'Ucuz']
+      },
+      cons: {
+        en: ['Islakken çok zayıf', 'Çabuk kırışır', 'Ömrü kısa'],
+        tr: ['Islakken çok zayıf', 'Çabuk kırışır', 'Ömrü kısa']
+      }
     },
     'acrylic': {
       name: { en: 'Acrylic', tr: 'Akrilik' },
       breathability: 2, warmth: 4, durability: 3,
       sensitivity: 'high',
-      warning: { en: 'May cause skin irritation, not recommended for sensitive skin', tr: 'Cilt tahrişine neden olabilir, hassas ciltler için önerilmez' },
-      explanation: { en: 'Synthetic wool alternative, lightweight and warm. May pill over time.', tr: 'Sentetik yün alternatifi, hafif ve sıcak. Zamanla tüylenme yapabilir.' }
+      warning: { en: 'May irritate sensitive skin', tr: 'Cilt tahrişi yapabilir' },
+      pros: {
+        en: ['Yün gibi sıcak', 'Hafif', 'Makinede yıkanabilir', 'Uygun fiyat'],
+        tr: ['Yün gibi sıcak', 'Hafif', 'Makinede yıkanabilir', 'Uygun fiyat']
+      },
+      cons: {
+        en: ['Tüylenme yapar', 'Kaşındırabilir', 'Kötü koku yapar', 'Çevre dostu değil'],
+        tr: ['Tüylenme yapar', 'Kaşındırabilir', 'Kötü koku yapar', 'Çevre dostu değil']
+      }
     },
     'modal': {
       name: { en: 'Modal', tr: 'Modal' },
       breathability: 4, warmth: 2, durability: 3,
       sensitivity: 'low',
       warning: { en: null, tr: null },
-      explanation: { en: 'Semi-synthetic from beech wood. Very soft, breathable, shrink-resistant.', tr: 'Kayın ağacından yarı sentetik. Çok yumuşak, nefes alan, çekmez.' }
+      pros: {
+        en: ['Çok yumuşak', 'Nefes alır', 'Çekmez', 'Renkler solmaz'],
+        tr: ['Çok yumuşak', 'Nefes alır', 'Çekmez', 'Renkler solmaz']
+      },
+      cons: {
+        en: ['Pahalı', 'Hassas', 'Sıcak hava da sıcak'],
+        tr: ['Pahalı', 'Hassas', 'Sıcak hava da sıcak']
+      }
     },
     'tencel': {
       name: { en: 'Tencel', tr: 'Tencel' },
       breathability: 5, warmth: 2, durability: 4,
       sensitivity: 'low',
       warning: { en: null, tr: null },
-      explanation: { en: 'Eco-friendly lyocell fiber. Excellent moisture management, silky feel.', tr: 'Çevre dostu liyosel lifi. Mükemmel nem yönetimi, ipek gibi his.' }
+      pros: {
+        en: ['Eco dostu', 'Mükemmel nefes alır', 'İpek gibi yumuşak', 'Nem yönetimi iyi'],
+        tr: ['Çevre dostu', 'Mükemmel nefes alır', 'İpek gibi yumuşak', 'Nem yönetimi iyi']
+      },
+      cons: {
+        en: ['Pahalı', 'Sınırlı seçenek', 'Bakım gerektirir'],
+        tr: ['Pahalı', 'Sınırlı seçenek', 'Bakım gerektirir']
+      }
     },
     'velvet': {
       name: { en: 'Velvet', tr: 'Kadife' },
       breathability: 2, warmth: 4, durability: 3,
       sensitivity: 'medium',
       warning: { en: null, tr: null },
-      explanation: { en: 'Soft woven fabric with dense pile. Luxurious feel but requires care.', tr: 'Yoğun yığına sahip yumuşak dokuma kumaş. Lüks his ama özen gerektirir.' }
+      pros: {
+        en: ['Lüks görünüm', 'Yumuşak', 'Sıcak tutar', 'Derin renkler'],
+        tr: ['Lüks görünüm', 'Yumuşak', 'Sıcak tutar', 'Derin renkler']
+      },
+      cons: {
+        en: ['Toz tutar', 'Özenli bakım gerekli', 'Az dayanıklı', 'Pahalı temizlik'],
+        tr: ['Toz tutar', 'Özenli bakım gerekli', 'Az dayanıklı', 'Pahalı temizlik']
+      }
     },
     'denim': {
       name: { en: 'Denim', tr: 'Kot' },
       breathability: 3, warmth: 4, durability: 5,
       sensitivity: 'low',
       warning: { en: null, tr: null },
-      explanation: { en: 'Sturdy cotton twill weave. Durable and versatile, softens with wear.', tr: 'Güçlü pamuklu çarşaf dokuma. Dayanıklı ve çok yönlü, giyildikçe yumuşar.' }
+      pros: {
+        en: ['Çok dayanıklı', 'Şık', 'Giyildikçe güzelleşir', 'Evrensel'],
+        tr: ['Çok dayanıklı', 'Şık', 'Giyildikçe güzelleşir', 'Her ortamda giyilir']
+      },
+      cons: {
+        en: ['Ağır', 'Geç kurur', 'Sıcak tutar', 'Çeker'],
+        tr: ['Ağır', 'Geç kurur', 'Sıcak tutar', 'Çeker']
+      }
     },
     'fleece': {
       name: { en: 'Fleece', tr: 'Polar' },
       breathability: 2, warmth: 5, durability: 4,
       sensitivity: 'medium',
-      warning: { en: 'Synthetic, may trap heat', tr: 'Sentetik, ısı hapsedebilir' },
-      explanation: { en: 'Synthetic brushed fabric. Excellent insulator, lightweight and quick-drying.', tr: 'Fırçalanmış sentetik kumaş. Mükemmel yalıtkan, hafif ve çabuk kurur.' }
+      warning: { en: 'May trap heat', tr: 'Isı hapsedebilir' },
+      pros: {
+        en: ['Mükemmel sıcak tutar', 'Hafif', 'Çabuk kurur', 'Makinede yıkanabilir'],
+        tr: ['Mükemmel sıcak tutar', 'Hafif', 'Çabuk kurur', 'Makinede yıkanabilir']
+      },
+      cons: {
+        en: ['Az nefes alır', 'Statik yapar', 'Tüylenme yapar', 'Çevre dostu değil'],
+        tr: ['Az nefes alır', 'Statik yapar', 'Tüylenme yapar', 'Çevre dostu değil']
+      }
     },
     'satin': {
       name: { en: 'Satin', tr: 'Saten' },
       breathability: 3, warmth: 2, durability: 3,
       sensitivity: 'low',
       warning: { en: null, tr: null },
-      explanation: { en: 'Smooth weave with glossy surface. Often polyester or silk blend.', tr: 'Parlak yüzeyli düzgün dokuma. Genellikle polyester veya ipek karışımı.' }
+      pros: {
+        en: ['Parlak görünüm', 'Yumuşak', 'Drape iyi', 'Lüks his'],
+        tr: ['Parlak görünüm', 'Yumuşak', 'İyi akış', 'Lüks his']
+      },
+      cons: {
+        en: ['Kolay kırışır', 'Kayabilir', 'Özenli bakım gerekli'],
+        tr: ['Kolay kırışır', 'Kayabilir', 'Özenli bakım gerekli']
+      }
     },
     'microfiber': {
       name: { en: 'Microfiber', tr: 'Mikro fiber' },
       breathability: 3, warmth: 3, durability: 4,
       sensitivity: 'medium',
       warning: { en: 'Synthetic fabric', tr: 'Sentetik kumaş' },
-      explanation: { en: 'Ultra-fine synthetic fibers. Soft, lightweight, good stain resistance.', tr: 'Ultra ince sentetik lifler. Yumuşak, hafif, iyi leke direnci.' }
+      pros: {
+        en: ['Çok yumuşak', 'Leke tutmaz', 'Hafif', 'Dayanıklı'],
+        tr: ['Çok yumuşak', 'Leke tutmaz', 'Hafif', 'Dayanıklı']
+      },
+      cons: {
+        en: ['Az nefes alır', 'Statik yapar', 'Kötü koku yapabilir'],
+        tr: ['Az nefes alır', 'Statik yapar', 'Kötü koku yapabilir']
+      }
     },
     'polyamide': {
       name: { en: 'Polyamide', tr: 'Poliamid' },
       breathability: 3, warmth: 3, durability: 5,
       sensitivity: 'medium',
       warning: { en: 'Synthetic fabric', tr: 'Sentetik kumaş' },
-      explanation: { en: 'Strong synthetic similar to nylon. Good elasticity and shape retention.', tr: 'Naylona benzer güçlü sentetik. İyi esneklik ve form koruma.' }
+      pros: {
+        en: ['Dayanıklı', 'Esnek', 'Hafif', 'Şekil koruyucu'],
+        tr: ['Dayanıklı', 'Esnek', 'Hafif', 'Şekil koruyucu']
+      },
+      cons: {
+        en: ['Sentetik', 'Az nefes alır', 'Sıcak tutabilir'],
+        tr: ['Sentetik', 'Az nefes alır', 'Sıcak tutabilir']
+      }
     }
   };
 
-  // Weave types with explanations
+  // Weave types with pros/cons
   const WEAVE_TYPES = {
     'knit': {
       name: { en: 'Knit', tr: 'Örme' },
-      explanation: { en: 'Flexible looped structure, stretchy and comfortable. Common in t-shirts and underwear.', tr: 'Esnek döngülü yapı, esnek ve rahat. Tişört ve iç giyimde yaygın.' }
+      pros: {
+        en: ['Esnek ve rahat', 'Vücuda oturur', 'Hareket özgürlüğü'],
+        tr: ['Esnek ve rahat', 'Vücuda oturur', 'Hareket özgürlüğü']
+      },
+      cons: {
+        en: ['Daha az dayanıklı', 'Şekil bozabilir', 'Tüylenme yapabilir'],
+        tr: ['Daha az dayanıklı', 'Şekil bozabilir', 'Tüylenme yapabilir']
+      }
     },
     'woven': {
       name: { en: 'Woven', tr: 'Dokuma' },
-      explanation: { en: 'Interlaced threads creating sturdy fabric. Less stretch, more durable.', tr: 'Düğümlü ipliklerle oluşan sağlam kumaş. Daha az esnek, daha dayanıklı.' }
+      pros: {
+        en: ['Dayanıklı', 'Şekil korur', 'Düzgün görünüm'],
+        tr: ['Dayanıklı', 'Şekil korur', 'Düzgün görünüm']
+      },
+      cons: {
+        en: ['Az esnek', 'Daha sert', 'Sıcak tutabilir'],
+        tr: ['Az esnek', 'Daha sert', 'Sıcak tutabilir']
+      }
     },
     'knitted': {
       name: { en: 'Knitted', tr: 'Örme' },
-      explanation: { en: 'Flexible looped structure, stretchy and comfortable. Common in t-shirts and underwear.', tr: 'Esnek döngülü yapı, esnek ve rahat. Tişört ve iç giyimde yaygın.' }
+      pros: {
+        en: ['Esnek ve rahat', 'Vücuda oturur', 'Hareket özgürlüğü'],
+        tr: ['Esnek ve rahat', 'Vücuda oturur', 'Hareket özgürlüğü']
+      },
+      cons: {
+        en: ['Daha az dayanıklı', 'Şekil bozabilir', 'Tüylenme yapabilir'],
+        tr: ['Daha az dayanıklı', 'Şekil bozabilir', 'Tüylenme yapabilir']
+      }
     }
   };
 
@@ -648,7 +802,8 @@
       Object.entries(WEAVE_TYPES).forEach(([keyword, weaveInfo]) => {
         if (text.toLowerCase().includes(keyword)) {
           data.weave = weaveInfo.name[I18N.currentLang] || weaveInfo.name.en;
-          data.weaveExplanation = weaveInfo.explanation[I18N.currentLang] || weaveInfo.explanation.en;
+          data.weavePros = weaveInfo.pros[I18N.currentLang] || weaveInfo.pros.en;
+          data.weaveCons = weaveInfo.cons[I18N.currentLang] || weaveInfo.cons.en;
         }
       });
     }
@@ -703,8 +858,9 @@
       data.warning = fabricInfo.warning[I18N.currentLang] || fabricInfo.warning.en;
       data.sensitivity = fabricInfo.sensitivity;
     }
-    if (fabricInfo && fabricInfo.explanation) {
-      data.explanation = fabricInfo.explanation[I18N.currentLang] || fabricInfo.explanation.en;
+    if (fabricInfo && fabricInfo.pros) {
+      data.pros = fabricInfo.pros[I18N.currentLang] || fabricInfo.pros.en;
+      data.cons = fabricInfo.cons[I18N.currentLang] || fabricInfo.cons.en;
     }
   }
 
@@ -815,20 +971,74 @@
       content.appendChild(createRow(I18N.t('bestFor'), data.seasonalRating.label, data.seasonalRating.icon));
     }
 
-    // Weave explanation
-    if (data.weaveExplanation) {
-      const explainDiv = document.createElement('div');
-      explainDiv.className = 'fabric-finder-explanation';
-      explainDiv.textContent = 'ℹ️ ' + data.weaveExplanation;
-      content.appendChild(explainDiv);
-    }
+    // Pros/Cons table
+    if (data.pros || data.cons || data.weavePros || data.weaveCons) {
+      const prosConsDiv = document.createElement('div');
+      prosConsDiv.className = 'fabric-finder-proscons';
 
-    // Material explanation
-    if (data.explanation) {
-      const explainDiv = document.createElement('div');
-      explainDiv.className = 'fabric-finder-explanation';
-      explainDiv.textContent = 'ℹ️ ' + data.explanation;
-      content.appendChild(explainDiv);
+      if (data.pros || data.cons) {
+        const title = document.createElement('div');
+        title.className = 'proscons-title';
+        title.textContent = data.material;
+        prosConsDiv.appendChild(title);
+      }
+
+      if (data.pros && data.pros.length > 0) {
+        const prosList = document.createElement('div');
+        prosList.className = 'pros-list';
+        data.pros.forEach(pro => {
+          const item = document.createElement('div');
+          item.className = 'pros-item';
+          item.textContent = '+ ' + pro;
+          prosList.appendChild(item);
+        });
+        prosConsDiv.appendChild(prosList);
+      }
+
+      if (data.cons && data.cons.length > 0) {
+        const consList = document.createElement('div');
+        consList.className = 'cons-list';
+        data.cons.forEach(con => {
+          const item = document.createElement('div');
+          item.className = 'cons-item';
+          item.textContent = '- ' + con;
+          consList.appendChild(item);
+        });
+        prosConsDiv.appendChild(consList);
+      }
+
+      if (data.weavePros && data.weavePros.length > 0) {
+        const weaveTitle = document.createElement('div');
+        weaveTitle.className = 'proscons-title';
+        weaveTitle.textContent = data.weave;
+        prosConsDiv.appendChild(weaveTitle);
+      }
+
+      if (data.weavePros && data.weavePros.length > 0) {
+        const prosList = document.createElement('div');
+        prosList.className = 'pros-list';
+        data.weavePros.forEach(pro => {
+          const item = document.createElement('div');
+          item.className = 'pros-item';
+          item.textContent = '+ ' + pro;
+          prosList.appendChild(item);
+        });
+        prosConsDiv.appendChild(prosList);
+      }
+
+      if (data.weaveCons && data.weaveCons.length > 0) {
+        const consList = document.createElement('div');
+        consList.className = 'cons-list';
+        data.weaveCons.forEach(con => {
+          const item = document.createElement('div');
+          item.className = 'cons-item';
+          item.textContent = '- ' + con;
+          consList.appendChild(item);
+        });
+        prosConsDiv.appendChild(consList);
+      }
+
+      content.appendChild(prosConsDiv);
     }
 
     // Warning section
