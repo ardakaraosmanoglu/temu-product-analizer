@@ -14,7 +14,7 @@
 
     translations: {
       en: {
-        title: 'Temu Vision',
+        title: 'Fabric Finder',
         material: 'Material',
         composition: 'Composition',
         fabric: 'Fabric',
@@ -43,7 +43,7 @@
         }
       },
       tr: {
-        title: 'Temu Vision',
+        title: 'Kumaş Bulucu',
         material: 'Malzeme',
         composition: 'Bileşim',
         fabric: 'Kumaş',
