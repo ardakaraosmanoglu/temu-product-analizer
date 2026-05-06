@@ -6,6 +6,15 @@
 
 **Shop Smarter, Not Harder.** Temu Vision is a powerful browser extension designed to help you decode e-commerce product listings, understand material quality, and make informed purchasing decisions on Temu and beyond.
 
+### 🚀 Quick Install Guide / Hızlı Kurulum Rehberi
+
+| 🇬🇧 English | 🇹🇷 Türkçe |
+| :--- | :--- |
+| 1. **Download** this repo as a ZIP & extract. | 1. Bu projeyi ZIP olarak **indirin** ve çıkartın. |
+| 2. Open `chrome://extensions/` in Chrome. | 2. Chrome'da `chrome://extensions/` açın. |
+| 3. Enable **Developer mode** (top right). | 3. **Geliştirici modu**nu aktif edin (sağ üst). |
+| 4. Click **Load unpacked** & select `chrome-extension` folder. | 4. **Paketlenmemiş öğe yükle** diyerek `chrome-extension` klasörünü seçin. |
+
 ![Project Preview](chrome-extension/temu-analizer-logo.png)
 
 ## 🌟 Why Use Temu Vision?
@@ -21,14 +30,6 @@ Have you ever wondered if that "Cotton" shirt is actually 100% cotton, or if it 
 *   **⚠️ Allergy & Sensitivity Alerts**: Get notified if a fabric might irritate sensitive skin or trap too much heat.
 *   **📋 Favorites & Comparison**: Save products to your personal favorites list to compare materials and quality side-by-side before you buy.
 *   **🌐 Multi-Language Support**: Fully localized in **English** and **Türkçe**.
-
-## 🚀 How to Install
-
-1.  **Download** the repository or install via the Chrome Web Store (coming soon).
-2.  Open Chrome and navigate to `chrome://extensions/`.
-3.  Enable **Developer Mode** (toggle in the top right).
-4.  Click **Load unpacked** and select the `chrome-extension` folder from this project.
-5.  Pin the extension to your toolbar for easy access!
 
 ## 🛠️ Setup (Optional AI Features)
 
