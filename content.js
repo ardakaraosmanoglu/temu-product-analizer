@@ -74,19 +74,21 @@
     },
 
     init() {
-      // Priority: 1) localStorage override, 2) Country-based (Cyprus=TR), 3) Browser language
-      const savedLang = localStorage.getItem('fabricFinder_lang');
-      if (savedLang) {
-        this.currentLang = savedLang;
-        return;
-      }
-      const browserLang = navigator.language.toLowerCase();
-      // Cyprus users default to Turkish
-      if (browserLang.startsWith('tr') || browserLang.startsWith('cy')) {
-        this.currentLang = 'tr';
-      } else {
-        this.currentLang = 'en';
-      }
+      // Load from chrome.storage.local (async)
+      const self = this;
+      chrome.storage.local.get(['lang', 'country'], function(result) {
+        if (result.lang) {
+          self.currentLang = result.lang;
+          return;
+        }
+        // Fallback to browser language
+        const browserLang = navigator.language.toLowerCase();
+        if (browserLang.startsWith('tr') || browserLang.startsWith('cy')) {
+          self.currentLang = 'tr';
+        } else {
+          self.currentLang = 'en';
+        }
+      });
     },
 
     t(key, params) {
@@ -110,7 +112,8 @@
     'material', 'fabric', 'composition', 'component', 'malzeme', 'kumaş',
     'bileşen', 'dokuma', 'season', 'mevsim', 'polyester', 'cotton', 'wool',
     'silk', 'linen', 'nylon', 'spandex', 'elastane', 'viscose', 'rayon',
-    'acrylic', 'modal', 'tencel', 'velvet', 'denim', 'fleece', 'satin'
+    'acrylic', 'modal', 'tencel', 'velvet', 'denim', 'fleece', 'satin',
+    'viskon', 'poliamid', 'naylon'
   ];
 
   const FABRIC_TYPES = {
@@ -190,7 +193,7 @@
       sensitivity: 'medium',
       warning: { en: 'Synthetic fabric', tr: 'Sentetik kumaş' },
       pros: {
-        en: ['Çok dayanıklı', 'Hafif', 'Çabuk kurur', 'Kolor tutar'],
+        en: ['Çok dayanıklı', 'Hafif', 'Çabuk kurur', 'Renk tutar'],
         tr: ['Çok dayanıklı', 'Hafif', 'Çabuk kurur', 'Renk tutar']
       },
       cons: {
@@ -198,8 +201,22 @@
         tr: ['Az nefes alır', 'Statik yapar', 'Sıcak tutabilir']
       }
     },
+    'polyamide': {
+      name: { en: 'Polyamide', tr: 'Poliamid' },
+      breathability: 3, warmth: 3, durability: 5,
+      sensitivity: 'medium',
+      warning: { en: 'Synthetic fabric', tr: 'Sentetik kumaş' },
+      pros: {
+        en: ['Dayanıklı', 'Hafif', 'Çabuk kurur', 'Renk tutar'],
+        tr: ['Dayanıklı', 'Hafif', 'Çabuk kurur', 'Renk tutar']
+      },
+      cons: {
+        en: ['Az nefes alır', 'Statik yapabilir'],
+        tr: ['Az nefes alır', 'Statik yapabilir']
+      }
+    },
     'spandex': {
-      name: { en: 'Spandex', tr: 'Spanks' },
+      name: { en: 'Spandex', tr: 'Elastan' },
       breathability: 3, warmth: 2, durability: 3,
       sensitivity: 'medium',
       warning: { en: 'Synthetic blend', tr: 'Sentetik karışım' },
@@ -280,6 +297,34 @@
       cons: {
         en: ['Pahalı', 'Hassas', 'Sıcak hava da sıcak'],
         tr: ['Pahalı', 'Hassas', 'Sıcak hava da sıcak']
+      }
+    },
+    'viskon': {
+      name: { en: 'Viscose', tr: 'Viskon' },
+      breathability: 4, warmth: 2, durability: 2,
+      sensitivity: 'low',
+      warning: { en: null, tr: null },
+      pros: {
+        en: ['Yumuşak', 'Nefes alır', 'İpek görünümü', 'Renk iyi tutar'],
+        tr: ['Yumuşak', 'Nefes alır', 'İpek görünümü', 'Renk iyi tutar']
+      },
+      cons: {
+        en: ['Kolay kırışır', 'Islakken zayıf', 'Çabuk solar', 'El dikimi gerekli'],
+        tr: ['Kolay kırışır', 'Islakken zayıf', 'Çabuk solar', 'El dikimi gerekli']
+      }
+    },
+    'rayon': {
+      name: { en: 'Rayon', tr: 'Rayon' },
+      breathability: 4, warmth: 2, durability: 2,
+      sensitivity: 'low',
+      warning: { en: null, tr: null },
+      pros: {
+        en: ['Yumuşak', 'Nefes alır', 'Parlak görünüm', 'Ucuz'],
+        tr: ['Yumuşak', 'Nefes alır', 'Parlak görünüm', 'Ucuz']
+      },
+      cons: {
+        en: ['Kolay kırışır', 'Şekil verir', 'Bakım zor'],
+        tr: ['Kolay kırışır', 'Şekil verir', 'Bakım zor']
       }
     },
     'tencel': {
@@ -594,28 +639,409 @@
     // 8. Calculate quality grade
     data.qualityGrade = calculateQualityGrade(data);
 
-    // 9. Scan reviews
-    data.reviews = scanReviews();
+    // 9. Scan reviews (using getTemuReviewData which returns items array for AI review)
+    data.reviews = getTemuReviewData(10);
 
     return data;
   }
 
-  function scanTemuSpecific(data) {
-    const temuState = findGlobalVar('__INITIAL_STATE__');
-    if (temuState) extractFromObject(temuState, data);
+  // ============================================
+  // Robust Product Data Extraction (JSON-LD + goodsProperty + Specs Fallback)
+  // ============================================
 
-    const universalData = findGlobalVar('__UNIVERSAL_DATA__');
-    if (universalData) extractFromObject(universalData, data);
+  const FIELD_MAP = {
+    material: ['Malzeme', 'Material', 'Kumaş', 'Fabric'],
+    composition: ['Bileşen', 'Composition', 'İçerik', 'Main Composition'],
+    fabric: ['Kumaş', 'Fabric'],
+    weaveMethod: ['Dokuma Yöntemi', 'Weaving Method'],
+    pattern: ['Desen', 'Pattern'],
+    details: ['Detaylar', 'Details'],
+    care: ['Kullanım Talimatı', 'Care Instructions', 'Washing Instructions'],
+    fitType: ['Kesim Tarzı', 'Fit Type'],
+    style: ['Stil', 'Style']
+  };
 
-    const goodsProperty = findGlobalVar('goodsProperty');
-    if (goodsProperty) extractFromObject(goodsProperty, data);
+  function normalizeKey(key) {
+    for (const [normalizedKey, aliases] of Object.entries(FIELD_MAP)) {
+      if (aliases.includes(key)) return normalizedKey;
+    }
+    return null;
+  }
 
-    document.querySelectorAll('script').forEach(script => {
-      const text = script.textContent;
-      if (text.includes('fabric') || text.includes('material') || text.includes('polyester')) {
-        extractFromText(text, data);
+  function setSpec(result, key, value) {
+    if (!key || !value) return;
+    const cleanValue = Array.isArray(value)
+      ? value.filter(Boolean).join(', ')
+      : String(value).trim();
+    if (!cleanValue) return;
+    result.rawSpecs[key] = cleanValue;
+    const normalizedKey = normalizeKey(key);
+    if (normalizedKey && !result[normalizedKey]) {
+      result[normalizedKey] = cleanValue;
+    }
+  }
+
+  function getJsonLdProduct() {
+    const scripts = document.querySelectorAll('script[type="application/ld+json"]');
+    for (const script of scripts) {
+      try {
+        const data = JSON.parse(script.textContent);
+        if (data['@type'] === 'Product') return data;
+        if (data['@graph']) {
+          const product = data['@graph'].find(item => item['@type'] === 'Product');
+          if (product) return product;
+        }
+        if (Array.isArray(data)) {
+          const product = data.find(item => item['@type'] === 'Product');
+          if (product) return product;
+        }
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  function extractGoodsPropertyFromScripts() {
+    const result = { rawSpecs: {} };
+    const scripts = [...document.querySelectorAll('script')];
+
+    for (const script of scripts) {
+      const text = script.textContent || '';
+      if (!text.includes('goodsProperty')) continue;
+
+      try {
+        // Try to find goodsProperty array pattern
+        const matches = text.match(/"goodsProperty"\s*:\s*(\[[\s\S]*?\])\s*,\s*"rows"/g);
+        if (matches) {
+          for (const match of matches) {
+            const jsonArrayText = match
+              .replace(/^"goodsProperty"\s*:\s*/, '')
+              .replace(/,\s*"rows"$/, '');
+            const properties = JSON.parse(jsonArrayText);
+            if (!Array.isArray(properties)) continue;
+
+            for (const prop of properties) {
+              if (prop?.key && prop?.values) {
+                setSpec(result, prop.key, prop.values);
+              }
+            }
+          }
+        }
+      } catch (_) {}
+    }
+    return result;
+  }
+
+  function extractSpecsFromDom() {
+    const result = { rawSpecs: {} };
+    const allKeys = Object.values(FIELD_MAP).flat();
+    const elements = [...document.querySelectorAll('div, span, td, li, p')]
+      .map(el => ({ text: el.innerText?.trim(), el }))
+      .filter(item => item.text && item.text.length < 200 && item.text.length > 0);
+
+    for (let i = 0; i < elements.length - 1; i++) {
+      const key = elements[i].text;
+      const value = elements[i + 1].text;
+      if (allKeys.includes(key) && value && value.length <= 150 && value !== key && !value.includes(':')) {
+        setSpec(result, key, value);
       }
-    });
+    }
+    return result;
+  }
+
+  // ============================================
+  // Reviews Extraction
+  // ============================================
+
+  function extractArrayAfterKey(text, key) {
+    const keyIndex = text.indexOf(`"${key}"`);
+    if (keyIndex === -1) return null;
+    const colonIndex = text.indexOf(":", keyIndex);
+    const startIndex = text.indexOf("[", colonIndex);
+    if (startIndex === -1) return null;
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+    for (let i = startIndex; i < text.length; i++) {
+      const char = text[i];
+      if (inString) {
+        if (escaped) {
+          escaped = false;
+        } else if (char === "\\") {
+          escaped = true;
+        } else if (char === '"') {
+          inString = false;
+        }
+      } else {
+        if (char === '"') {
+          inString = true;
+        } else if (char === "[") {
+          depth++;
+        } else if (char === "]") {
+          depth--;
+          if (depth === 0) {
+            return text.slice(startIndex, i + 1);
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  function extractTemuReviews(limit = 10) {
+    const scripts = [...document.querySelectorAll("script")];
+    const reviews = [];
+
+    for (const script of scripts) {
+      const text = script.textContent || "";
+      if (!text.includes('"commentList"')) continue;
+      try {
+        const commentListText = extractArrayAfterKey(text, "commentList");
+        if (!commentListText) continue;
+        const commentList = JSON.parse(commentListText);
+        if (!Array.isArray(commentList)) continue;
+
+        for (const review of commentList) {
+          reviews.push({
+            reviewId: review.reviewId || null,
+            name: review.name || null,
+            rating: review.score || null,
+            comment: review.comment || null,
+            date: review.concatTimeLang || null,
+            timestamp: review.time || null,
+            goodsId: review.goodsId || null,
+            skuId: review.skuId || null,
+            language: review.reviewLang || null,
+            avatar: review.avatar || null
+          });
+        }
+      } catch (error) {
+        // Keep silent so the product extractor does not break
+      }
+    }
+
+    const uniqueReviews = Array.from(
+      new Map(reviews.map(review => [review.reviewId, review])).values()
+    );
+
+    return uniqueReviews
+      .filter(review => review.comment || review.rating)
+      .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0))
+      .slice(0, limit);
+  }
+
+  function getTemuReviewData(limit = 10) {
+    const items = extractTemuReviews(limit);
+    return {
+      source: "page_state",
+      requestedLimit: limit,
+      returnedCount: items.length,
+      hasFullLimit: items.length >= limit,
+      items
+    };
+  }
+
+  // ============================================
+  // Product Image Extraction
+  // ============================================
+
+  function normalizeImageUrl(url) {
+    if (!url) return null;
+    let cleanUrl = String(url).trim();
+    if (cleanUrl.startsWith("//")) {
+      cleanUrl = "https:" + cleanUrl;
+    }
+    try {
+      const parsed = new URL(cleanUrl, location.origin);
+      parsed.searchParams.delete("refer_page_name");
+      parsed.searchParams.delete("refer_page_id");
+      parsed.searchParams.delete("refer_page_sn");
+      return parsed.href;
+    } catch (_) {
+      return cleanUrl;
+    }
+  }
+
+  function extractBestImageFromSrcset(srcset) {
+    if (!srcset) return null;
+    if (!srcset.includes(",")) {
+      return srcset.trim().split(" ")[0];
+    }
+    const candidates = srcset
+      .split(",")
+      .map(item => item.trim().split(" ")[0])
+      .filter(Boolean);
+    return candidates[candidates.length - 1] || null;
+  }
+
+  function isLikelyProductImage(url) {
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    const allowedPatterns = ["img.kwcdn.com", "temu.com", "goods", "product", "main", "thumbnail"];
+    const blockedPatterns = ["avatar", "logo", "icon", "sprite", "payment", "review", "user", "profile", "captcha"];
+    const isImage = lower.includes(".jpg") || lower.includes(".jpeg") || lower.includes(".png") || lower.includes(".webp") || lower.includes("image");
+    const allowed = allowedPatterns.some(pattern => lower.includes(pattern));
+    const blocked = blockedPatterns.some(pattern => lower.includes(pattern));
+    return isImage && allowed && !blocked;
+  }
+
+  function extractImageUrlsFromScripts() {
+    const images = new Set();
+    const scripts = [...document.querySelectorAll("script")];
+    const imageRegex = /https?:\\?\/\\?\/[^"'\\]+?\.(?:jpg|jpeg|png|webp)[^"'\\]*/gi;
+    for (const script of scripts) {
+      const text = script.textContent || "";
+      const matches = text.match(imageRegex);
+      if (!matches) continue;
+      for (let url of matches) {
+        url = url.replaceAll("\\/", "/");
+        if (isLikelyProductImage(url)) {
+          images.add(normalizeImageUrl(url));
+        }
+      }
+    }
+    return [...images];
+  }
+
+  function extractTemuProductImages() {
+    const images = new Set();
+
+    // 1. JSON-LD images
+    const jsonLdScripts = [...document.querySelectorAll('script[type="application/ld+json"]')];
+    for (const script of jsonLdScripts) {
+      try {
+        const data = JSON.parse(script.textContent.trim());
+        const items = Array.isArray(data) ? data : [data];
+        for (const item of items) {
+          if (item?.["@type"] === "Product") {
+            if (Array.isArray(item.image)) {
+              item.image.forEach(img => images.add(normalizeImageUrl(img)));
+            } else if (item.image) {
+              images.add(normalizeImageUrl(item.image));
+            }
+          }
+        }
+      } catch (_) {}
+    }
+
+    // 2. Meta og:image
+    const ogImage = document.querySelector('meta[property="og:image"]')?.content;
+    if (ogImage) {
+      images.add(normalizeImageUrl(ogImage));
+    }
+
+    // 3. Script state images
+    for (const img of extractImageUrlsFromScripts()) {
+      images.add(normalizeImageUrl(img));
+    }
+
+    // 4. DOM image tags
+    const imgElements = [...document.querySelectorAll("img")];
+    for (const img of imgElements) {
+      const src = img.currentSrc || img.src || img.getAttribute("data-src") || img.getAttribute("data-original") || img.getAttribute("srcset");
+      if (!src) continue;
+      const url = extractBestImageFromSrcset(src);
+      if (isLikelyProductImage(url)) {
+        images.add(normalizeImageUrl(url));
+      }
+    }
+
+    // Filter for Temu product images specifically
+    return [...images].filter(url => url && url.includes("img.kwcdn.com") && !url.includes("avatar") && !url.includes("review"));
+  }
+
+  function extractTemuProductData() {
+    const result = {
+      title: null,
+      sku: null,
+      price: null,
+      currency: null,
+      material: null,
+      composition: null,
+      fabric: null,
+      weaveMethod: null,
+      pattern: null,
+      details: null,
+      care: null,
+      fitType: null,
+      style: null,
+      rawSpecs: {},
+      reviews: null,
+      images: []
+    };
+
+    // Extract images first
+    result.images = extractTemuProductImages();
+
+    // 1. JSON-LD extraction (highest priority)
+    const product = getJsonLdProduct();
+    if (product) {
+      result.title = product.name || null;
+      result.sku = product.sku || product.mpn || null;
+      result.material = product.material || null;
+      result.pattern = product.pattern || null;
+      if (product.offers) {
+        result.price = product.offers.price || null;
+        result.currency = product.offers.priceCurrency || null;
+      }
+    }
+
+    // 2. goodsProperty extraction (new Temu pattern)
+    const goodsProp = extractGoodsPropertyFromScripts();
+    Object.assign(result.rawSpecs, goodsProp.rawSpecs);
+    if (goodsProp.material && !result.material) result.material = goodsProp.material;
+    if (goodsProp.composition) result.composition = goodsProp.composition;
+    if (goodsProp.fabric) result.fabric = goodsProp.fabric;
+    if (goodsProp.weaveMethod) result.weaveMethod = goodsProp.weaveMethod;
+    if (goodsProp.pattern) result.pattern = goodsProp.pattern;
+    if (goodsProp.details) result.details = goodsProp.details;
+    if (goodsProp.care) result.care = goodsProp.care;
+    if (goodsProp.fitType) result.fitType = goodsProp.fitType;
+    if (goodsProp.style) result.style = goodsProp.style;
+
+    // 3. DOM specs extraction (fallback)
+    const domSpecs = extractSpecsFromDom();
+    Object.assign(result.rawSpecs, domSpecs.rawSpecs);
+    if (domSpecs.material && !result.material) result.material = domSpecs.material;
+    if (domSpecs.composition && !result.composition) result.composition = domSpecs.composition;
+    if (domSpecs.pattern && !result.pattern) result.pattern = domSpecs.pattern;
+    if (domSpecs.details && !result.details) result.details = domSpecs.details;
+
+    // 4. Fallback from title
+    if (!result.title) result.title = document.title || null;
+
+    // 5. Extract reviews from page
+    result.reviews = getTemuReviewData(10);
+
+    return result;
+  }
+
+  function scanTemuSpecific(data) {
+    const productData = extractTemuProductData();
+
+    // Set material - use fabric name lookup or raw value
+    if (productData.material) {
+      const fabric = extractFabricValue(productData.material);
+      data.material = fabric || productData.material;
+    }
+
+    // Set composition
+    if (productData.composition) {
+      data.composition = productData.composition;
+    }
+
+    // Set other clothing attributes
+    if (productData.fabric) data.fabric = productData.fabric;
+    if (productData.weaveMethod) data.weave = productData.weaveMethod;
+    if (productData.pattern) data.pattern = productData.pattern;
+    if (productData.details) data.details = productData.details;
+    if (productData.care) data.care = productData.care;
+    if (productData.fitType) data.fitType = productData.fitType;
+    if (productData.style) data.style = productData.style;
+
+    // Raw specs for debugging
+    if (Object.keys(productData.rawSpecs).length > 0) {
+      data.rawSpecs = productData.rawSpecs;
+    }
   }
 
   function findGlobalVar(name) {
@@ -636,7 +1062,8 @@
       if (value && typeof value === 'object') {
         if (keyLower.includes('material') || keyLower.includes('fabric') || keyLower.includes('component')) {
           if (typeof value === 'string') {
-            extractFromText(value, data);
+            const fabric = extractFabricValue(value);
+            if (fabric && !data.material) data.material = fabric;
           } else {
             extractFromObject(value, data, depth + 1);
           }
@@ -645,7 +1072,8 @@
         }
       } else if (typeof value === 'string') {
         if (keyLower.includes('material') || keyLower.includes('fabric')) {
-          extractFromText(value, data);
+          const fabric = extractFabricValue(value);
+          if (fabric && !data.material) data.material = fabric;
         }
       }
     }
@@ -676,11 +1104,24 @@
     if (!obj || typeof obj !== 'object') return;
 
     const materialFields = ['material', 'fabric', 'composition', 'materials', 'fabricComposition'];
+    const foundCompositions = new Set();
 
     materialFields.forEach(field => {
-      if (obj[field] && !data.material) {
-        const value = extractFabricValue(obj[field]);
-        if (value) data.material = value;
+      if (obj[field]) {
+        // Extract material name
+        if (!data.material) {
+          const value = extractFabricValue(obj[field]);
+          if (value) data.material = value;
+        }
+        // Extract composition with percentages
+        const compStr = String(obj[field]);
+        Object.entries(FABRIC_TYPES).forEach(([keyword, info]) => {
+          const regex = new RegExp(`(\\d+\\s*%\\s*${keyword})`, 'gi');
+          const matches = compStr.match(regex);
+          if (matches) {
+            matches.forEach(m => foundCompositions.add(m.toLowerCase()));
+          }
+        });
       }
     });
 
@@ -689,8 +1130,23 @@
         if (prop.name && FABRIC_KEYWORDS.some(k => prop.name.toLowerCase().includes(k))) {
           const value = extractFabricValue(prop.value);
           if (value && !data.material) data.material = value;
+          // Also extract percentage from prop.value
+          const compStr = String(prop.value || '');
+          Object.entries(FABRIC_TYPES).forEach(([keyword, info]) => {
+            const regex = new RegExp(`(\\d+\\s*%\\s*${keyword})`, 'gi');
+            const matches = compStr.match(regex);
+            if (matches) {
+              matches.forEach(m => foundCompositions.add(m.toLowerCase()));
+            }
+          });
         }
       });
+    }
+
+    // Set composition if found
+    if (foundCompositions.size > 0 && !data.composition) {
+      const uniqueComps = [...foundCompositions].slice(0, 5).map(m => capitalizeFirstLetter(m));
+      data.composition = uniqueComps.join(', ');
     }
   }
 
@@ -853,9 +1309,18 @@
     }
   };
 
-  // Get selected country (default: Cyprus)
+  // Cached country value (loaded async from chrome.storage.local)
+  let cachedCountry = 'CY';
+
+  // Load country from chrome.storage.local
+  chrome.storage.local.get(['country'], function(result) {
+    if (result.country) {
+      cachedCountry = result.country;
+    }
+  });
+
   function getSelectedCountry() {
-    return localStorage.getItem('fabricFinder_country') || 'CY';
+    return cachedCountry;
   }
 
   function scanVisibleContent(data) {
@@ -868,22 +1333,54 @@
       '[class*="attr"]', '[class*="property"]', '[class*="info"]'
     ];
 
-    const foundMaterials = new Set();
     const foundCompositions = new Set();
+    const foundSpecificFabric = []; // Track found specific fabrics with their source text length
+    let foundGenericWeave = null;
+
+    // Also scan product title/name for material hints (e.g., "180g Pamuk Tişört")
+    const titleEl = document.querySelector('h1, [class*="title"], [class*="name"], [class*="product"]');
+    if (titleEl) {
+      const titleText = titleEl.textContent || '';
+      Object.entries(FABRIC_TYPES).forEach(([keyword, info]) => {
+        if (titleText.toLowerCase().includes(keyword)) {
+          foundSpecificFabric.push({
+            name: info.name[I18N.currentLang] || info.name.en,
+            textLength: titleText.length,
+            source: 'title'
+          });
+        }
+      });
+    }
 
     selectors.forEach(selector => {
       try {
         document.querySelectorAll(selector).forEach(el => {
+          // Skip our own widget to avoid reading extension's own content
+          if (el.id === 'fabric-finder-widget' || el.closest('#fabric-finder-widget')) return;
+
           const text = el.textContent || '';
           // Skip if text is too long (likely script/json, not real content)
           if (text.length > 500) return;
 
-          // Extract material
+          // Skip text that looks like descriptions (sentences with periods, no percentages)
+          if (text.length > 50 && text.includes('.') && !text.includes('%')) return;
+
+          // FIRST PASS: Find specific fabric materials ONLY (pamuk, polyester, etc.)
+          // Store all found, don't set data.material yet
+          if (text.length < 200) {
+            Object.entries(FABRIC_TYPES).forEach(([keyword, info]) => {
+              if (text.toLowerCase().includes(keyword)) {
+                foundSpecificFabric.push({
+                  name: info.name[I18N.currentLang] || info.name.en,
+                  textLength: text.length,
+                  source: 'element'
+                });
+              }
+            });
+          }
+
+          // Extract composition (with percentage for accuracy) - always collect these
           Object.entries(FABRIC_TYPES).forEach(([keyword, info]) => {
-            if (text.toLowerCase().includes(keyword) && !data.material) {
-              data.material = info.name[I18N.currentLang] || info.name.en;
-            }
-            // Extract composition (with percentage for accuracy)
             const compRegex = new RegExp(`(\\d+\\s*%\\s*${keyword})`, 'gi');
             const compMatches = text.match(compRegex);
             if (compMatches) {
@@ -916,19 +1413,29 @@
             });
           }
 
-          // Extract weave
-          if (!data.weave) {
+          // Extract weave (only if no specific fabric found)
+          if (!foundGenericWeave) {
             Object.entries(WEAVE_TYPES).forEach(([keyword, weaveInfo]) => {
               if (text.toLowerCase().includes(keyword)) {
-                data.weave = weaveInfo.name[I18N.currentLang] || weaveInfo.name.en;
-                data.weavePros = weaveInfo.pros[I18N.currentLang] || weaveInfo.pros.en;
-                data.weaveCons = weaveInfo.cons[I18N.currentLang] || weaveInfo.cons.en;
+                foundGenericWeave = weaveInfo.name[I18N.currentLang] || weaveInfo.name.en;
               }
             });
           }
         });
       } catch (e) {}
     });
+
+    // Set material: prefer shortest text source (most specific) from specific fabrics
+    if (foundSpecificFabric.length > 0) {
+      // Sort by text length (shortest = most specific) and pick the first
+      foundSpecificFabric.sort((a, b) => a.textLength - b.textLength);
+      data.material = foundSpecificFabric[0].name;
+    }
+
+    // Set weave ONLY if no specific fabric material was found
+    if (!data.material && foundGenericWeave) {
+      data.weave = foundGenericWeave;
+    }
 
     // Set deduplicated composition (max 5 items)
     if (foundCompositions.size > 0) {
@@ -1051,8 +1558,103 @@
     return titleEl ? titleEl.textContent.trim().substring(0, 100) : 'Unknown Product';
   }
 
-  function saveToFavorites(data) {
-    const favorites = JSON.parse(localStorage.getItem('fabricFinder_favorites') || '[]');
+  async function generateAiReview(data, apiKey, aiModel, lang) {
+    try {
+      const langInstruction = lang === 'tr' ? 'Respond in Turkish (Türkçe).' : 'Respond in English.';
+
+      const productInfo = `Product: ${data.title || 'Unknown'}
+Material: ${data.material || 'Unknown'}
+Composition: ${data.composition || 'Unknown'}
+Quality Grade: ${data.qualityGrade?.gradeLabel || 'N/A'}
+Season Rating: ${data.seasonalRating?.label || 'N/A'}`;
+
+      const prompt = `Analyze this product and return JSON only:
+
+${productInfo}
+
+${langInstruction}
+
+Return this exact JSON format (replace X with your assessment 1-10):
+{
+  "quality": X,
+  "breathability": X,
+  "durability": X,
+  "comfort": X,
+  "for": "who should buy",
+  "pros": ["+ point"],
+  "cons": ["- point"]
+}
+
+Return ONLY valid JSON, no explanation.`;
+
+      const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+          'HTTP-Referer': data.url || '',
+          'X-Title': 'Temu Product Analyzer'
+        },
+        body: JSON.stringify({
+          model: aiModel || 'google/gemini-2.5-flash-lite',
+          messages: [{ role: 'user', content: prompt }],
+          max_tokens: 500
+        })
+      });
+
+      if (!response.ok) return null;
+
+      const result = await response.json();
+      const aiResponse = result.choices?.[0]?.message?.content || '';
+
+      // Parse JSON
+      try {
+        let jsonStr = aiResponse;
+        const jsonMatch = aiResponse.match(/```(?:json)?\s*([\s\S]*?)\s*```/);
+        if (jsonMatch) jsonStr = jsonMatch[1];
+        const startIdx = jsonStr.indexOf('{');
+        const endIdx = jsonStr.lastIndexOf('}');
+        if (startIdx !== -1 && endIdx !== -1) {
+          jsonStr = jsonStr.substring(startIdx, endIdx + 1);
+        }
+        return JSON.parse(jsonStr);
+      } catch (e) {
+        return null;
+      }
+    } catch (e) {
+      console.warn('AI review generation failed:', e);
+      return null;
+    }
+  }
+
+  async function saveToFavorites(data) {
+    console.log('[DEBUG] saveToFavorites called', { data });
+    // Get images if not already extracted
+    const images = data.images || extractTemuProductImages();
+
+    // Get settings first (with error handling for Chrome storage issues)
+    let settings = { apiKey: null, aiModel: 'google/gemini-2.5-flash-lite', lang: 'en' };
+    try {
+      settings = await chrome.storage.local.get(['apiKey', 'aiModel', 'lang']);
+      settings = { ...settings, aiModel: settings.aiModel || 'google/gemini-2.5-flash-lite', lang: settings.lang || 'en' };
+      console.log('[DEBUG] settings', settings);
+    } catch (e) {
+      console.warn('[DEBUG] Could not get settings:', e);
+    }
+
+    // Generate AI review BEFORE saving (like material/qualityGrade pattern)
+    let aiReview = null;
+    if (settings.apiKey) {
+      console.log('[DEBUG] API key found, generating AI review...');
+      try {
+        aiReview = await generateAiReview(data, settings.apiKey, settings.aiModel, settings.lang);
+        console.log('[DEBUG] AI review result:', aiReview);
+      } catch (e) {
+        console.warn('AI review generation failed:', e);
+      }
+    } else {
+      console.log('[DEBUG] No API key found, skipping AI review');
+    }
 
     const entry = {
       url: getProductUrl(),
@@ -1065,20 +1667,33 @@
       seasonalRating: data.seasonalRating,
       qualityGrade: data.qualityGrade,
       warning: data.warning,
-      savedAt: new Date().toISOString()
+      image: images[0] || null,
+      images: images.slice(0, 5) || [],
+      reviews: data.reviews || null,
+      savedAt: new Date().toISOString(),
+      aiReview: aiReview
     };
+    console.log('[DEBUG] Entry to save:', entry);
 
-    const existingIndex = favorites.findIndex(f => f.url === entry.url);
-    if (existingIndex >= 0) {
-      favorites[existingIndex] = entry;
-    } else {
-      favorites.unshift(entry);
+    // Single save operation - aiReview already included (with error handling)
+    try {
+      const result = await chrome.storage.local.get(['favorites']);
+      let favorites = result.favorites || [];
+      const existingIndex = favorites.findIndex(f => f.url === entry.url);
+
+      if (existingIndex >= 0) {
+        favorites[existingIndex] = entry;
+      } else {
+        favorites.unshift(entry);
+      }
+      if (favorites.length > 50) favorites.pop();
+
+      await chrome.storage.local.set({ favorites });
+    } catch (e) {
+      console.error('[DEBUG] Failed to save to storage:', e);
     }
 
-    if (favorites.length > 50) favorites.pop();
-
-    localStorage.setItem('fabricFinder_favorites', JSON.stringify(favorites));
-    return favorites.length;
+    return entry;
   }
 
   // ============================================
@@ -1229,14 +1844,14 @@
     }
 
     // Reviews section
-    if (data.reviews && data.reviews.count > 0) {
+    if (data.reviews && data.reviews.items && data.reviews.items.length > 0) {
       const reviewDiv = document.createElement('div');
       reviewDiv.className = 'fabric-finder-reviews';
-      const ratingStars = '⭐'.repeat(Math.round(parseFloat(data.reviews.averageRating)));
-      reviewDiv.textContent = `${I18N.t('basedOnReviews', { count: data.reviews.count })} ${ratingStars} ${data.reviews.averageRating}`;
-      if (data.reviews.keywords && data.reviews.keywords.length > 0) {
-        reviewDiv.textContent += ` | ${data.reviews.keywords.join(', ')}`;
-      }
+      const count = data.reviews.items.length;
+      const ratings = data.reviews.items.filter(r => r.rating).map(r => r.rating);
+      const avgRating = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length).toFixed(1) : '0';
+      const ratingStars = '⭐'.repeat(Math.round(parseFloat(avgRating)));
+      reviewDiv.textContent = `${I18N.t('basedOnReviews', { count })} ${ratingStars} ${avgRating}`;
       content.appendChild(reviewDiv);
     }
 
@@ -1246,15 +1861,28 @@
 
     const saveBtn = document.createElement('button');
     saveBtn.className = 'fabric-finder-btn';
-    saveBtn.textContent = I18N.t('saveToFavorites');
-    saveBtn.addEventListener('click', () => {
-      saveToFavorites(data);
-      saveBtn.textContent = I18N.t('savedToFavorites');
-      saveBtn.disabled = true;
-      setTimeout(() => {
+
+    // Check if already saved
+    const productUrl = getProductUrl();
+    chrome.storage.local.get(['favorites'], (result) => {
+      const favorites = result.favorites || [];
+      const isAlreadySaved = favorites.some(f => f.url === productUrl);
+      if (isAlreadySaved) {
+        saveBtn.textContent = I18N.t('savedToFavorites');
+        saveBtn.disabled = true;
+      } else {
         saveBtn.textContent = I18N.t('saveToFavorites');
-        saveBtn.disabled = false;
-      }, 2000);
+        saveBtn.addEventListener('click', async () => {
+          saveBtn.textContent = '⏳...';
+          saveBtn.disabled = true;
+          await saveToFavorites(data);
+          saveBtn.textContent = I18N.t('savedToFavorites');
+          setTimeout(() => {
+            saveBtn.textContent = I18N.t('saveToFavorites');
+            saveBtn.disabled = false;
+          }, 2000);
+        });
+      }
     });
 
     actions.appendChild(saveBtn);
@@ -1314,4 +1942,42 @@
   } else {
     setTimeout(init, 1000);
   }
+
+  // Watch for dynamic content changes (Temu lazy-loads product info)
+  let scanTimeout = null;
+  const observer = new MutationObserver(() => {
+    // Debounce re-scans
+    if (scanTimeout) return;
+    scanTimeout = setTimeout(() => {
+      scanTimeout = null;
+      if (widget && !widget.dataset.scanned) {
+        // Re-scan page for updated content
+        const data = { material: null, composition: null };
+        scanVisibleContent(data);
+        if (data.material && !document.getElementById('fabric-finder-widget').dataset.material) {
+          // Material found, re-render widget
+          removeWidget();
+          init();
+        }
+      }
+    }, 2000);
+  });
+
+  // Start observing once body is available
+  if (document.body) {
+    observer.observe(document.body, { childList: true, subtree: true });
+  } else {
+    document.addEventListener('DOMContentLoaded', () => {
+      observer.observe(document.body, { childList: true, subtree: true });
+    });
+  }
+
+  // Message listener for popup communication
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'EXTRACT_PRODUCT') {
+      const data = extractTemuProductData();
+      sendResponse(data);
+    }
+    return true;
+  });
 })();

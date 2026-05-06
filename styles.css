@@ -24,7 +24,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 14px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
   color: #ffffff;
 }
 
@@ -176,7 +176,7 @@
 .fabric-finder-btn {
   width: 100%;
   padding: 10px 16px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
   color: #ffffff;
   border: none;
   border-radius: 8px;
@@ -188,7 +188,7 @@
 
 .fabric-finder-btn:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  box-shadow: 0 4px 12px rgba(30, 136, 229, 0.4);
 }
 
 .fabric-finder-btn:active {
@@ -207,6 +207,51 @@
   color: #888888;
   font-size: 13px;
   padding: 12px 0;
+}
+
+/* AI Result (favorites page) */
+.ai-result {
+  margin: 12px 0;
+  padding: 12px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  font-size: 12px;
+}
+
+.ai-result table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.ai-result td {
+  padding: 4px 0;
+  vertical-align: top;
+}
+
+.ai-result td:first-child {
+  font-weight: 600;
+  color: #555;
+  width: 100px;
+}
+
+.ai-result td:last-child {
+  color: #333;
+}
+
+.ai-result .rating {
+  color: #1e88e5;
+}
+
+.ai-result .for-item {
+  color: #2e7d32;
+}
+
+.ai-result .pros {
+  color: #2e7d32;
+}
+
+.ai-result .cons {
+  color: #c62828;
 }
 
 /* Responsive */

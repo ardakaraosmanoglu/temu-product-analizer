@@ -59,7 +59,7 @@
 
     .tab.active {
       background: #fff;
-      color: #667eea;
+      color: #1e88e5;
       box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
 
@@ -84,7 +84,7 @@
 
     .info h3 {
       font-size: 12px;
-      color: #667eea;
+      color: #1e88e5;
       margin-bottom: 6px;
     }
 
@@ -100,7 +100,7 @@
 
     .info li::before {
       content: '\2022';
-      color: #667eea;
+      color: #1e88e5;
       margin-right: 6px;
     }
 
@@ -132,7 +132,7 @@
 
     .favorite-material {
       font-size: 11px;
-      color: #667eea;
+      color: #1e88e5;
       margin-bottom: 4px;
     }
 
@@ -201,6 +201,23 @@
 
     .clear-all:hover {
       background: #ffcdd2;
+    }
+
+    .open-full-btn {
+      width: 100%;
+      padding: 8px;
+      background: #e3f2fd;
+      color: #1e88e5;
+      border: none;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .open-full-btn:hover {
+      background: #bbdefb;
     }
 
     .status {
@@ -292,9 +309,25 @@
         <option value="en">English</option>
       </select>
     </div>
+
+    <div class="info">
+      <h3>OpenRouter API Key</h3>
+      <p style="font-size: 10px; color: #888; margin-bottom: 8px;">For AI-powered product review analysis</p>
+      <input type="password" id="api-key" placeholder="sk-or-v2-..." style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-size: 12px;">
+      <p style="font-size: 9px; color: #aaa; margin-top: 4px;">Get your API key from <a href="https://openrouter.ai/keys" target="_blank" style="color: #1e88e5;">openrouter.ai/keys</a></p>
+    </div>
+
+    <div class="info">
+      <h3>AI Model</h3>
+      <p style="font-size: 10px; color: #888; margin-bottom: 8px;">OpenRouter model ID for AI review</p>
+      <input type="text" id="ai-model" placeholder="google/gemini-2.5-flash-lite" value="google/gemini-2.5-flash-lite" style="width: 100%; padding: 8px; border-radius: 6px; border: 1px solid #ddd; font-size: 12px;">
+      <p style="font-size: 9px; color: #aaa; margin-top: 4px;">Browse models at <a href="https://openrouter.ai/models" target="_blank" style="color: #1e88e5;">openrouter.ai/models</a></p>
+    </div>
+
   </div>
 
   <div id="tab-favorites" class="tab-content">
+    <button id="open-full-page" class="open-full-btn" style="display: none;">📋 Full Page View</button>
     <div id="favorites-list" class="favorites-list"></div>
     <button id="clear-all" class="clear-all" style="display: none;">Clear All Favorites</button>
   </div>

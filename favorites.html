@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Temu Product Analyzer - Favorites</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #f5f5f5;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid #1e88e5;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      color: #1e88e5;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #1e88e5;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1565c0;
+    }
+
+    .btn-danger {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .btn-danger:hover {
+      background: #ffcdd2;
+    }
+
+    .stats {
+      display: flex;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .stat {
+      background: white;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1e88e5;
+    }
+
+    .stat-label {
+      font-size: 12px;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .favorites-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+      gap: 16px;
+    }
+
+    .favorite-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .favorite-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    }
+
+    .card-header {
+      background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+      color: white;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      max-width: 280px;
+    }
+
+    .card-delete {
+      background: rgba(255,255,255,0.2);
+      border: none;
+      color: white;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .card-delete:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    .card-body {
+      padding: 16px;
+    }
+
+    .card-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .card-row:last-child {
+      border-bottom: none;
+    }
+
+    .card-label {
+      font-size: 12px;
+      color: #888;
+      font-weight: 500;
+    }
+
+    .card-value {
+      font-size: 13px;
+      color: #333;
+      font-weight: 600;
+      text-align: right;
+      max-width: 200px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .card-value.material {
+      color: #1e88e5;
+    }
+
+    .card-value.season {
+      color: #2e7d32;
+    }
+
+    .card-value.warning {
+      color: #e65100;
+    }
+
+    .card-meta {
+      display: flex;
+      gap: 12px;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #f0f0f0;
+      font-size: 11px;
+      color: #999;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .card-btn {
+      flex: 1;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .card-btn.open {
+      background: #e3f2fd;
+      color: #1e88e5;
+    }
+
+    .card-btn.open:hover {
+      background: #bbdefb;
+    }
+
+    .card-btn.delete {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .card-btn.delete:hover {
+      background: #ffcdd2;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 80px 40px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .empty-icon {
+      font-size: 64px;
+      margin-bottom: 16px;
+    }
+
+    .empty-title {
+      font-size: 20px;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .empty-text {
+      font-size: 14px;
+      color: #888;
+    }
+
+    .grade-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .grade-a { background: #e8f5e9; color: #2e7d32; }
+    .grade-b { background: #e3f2fd; color: #1976d2; }
+    .grade-c { background: #fff3e0; color: #f57c00; }
+    .grade-d { background: #ffebee; color: #d32f2f; }
+
+    .card-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: #f5f5f5;
+    }
+
+    .card-btn.ai-review {
+      background: linear-gradient(135deg, #1e88e5 0%, #1565c0 100%);
+      color: white;
+    }
+
+    .card-btn.ai-review:hover {
+      background: linear-gradient(135deg, #1565c0 0%, #0d47a1 100%);
+    }
+
+    .card-btn.ai-review:disabled {
+      background: #ccc;
+      cursor: default;
+    }
+
+    .card-btn.reviews-toggle {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .card-btn.reviews-toggle:hover {
+      background: #c8e6c9;
+    }
+
+    .card-reviews-container {
+      margin-top: 8px;
+      padding: 8px;
+      background: #fafafa;
+      border-radius: 6px;
+      font-size: 11px;
+    }
+
+    .review-item {
+      padding: 4px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .review-item:last-child {
+      border-bottom: none;
+    }
+
+    .review-rating {
+      color: #ff9800;
+      margin-right: 4px;
+    }
+
+    .review-comment {
+      color: #333;
+    }
+
+    .review-date {
+      color: #999;
+      font-size: 10px;
+      margin-left: 4px;
+    }
+
+    .ai-result {
+      margin-top: 12px;
+      padding: 12px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      font-size: 11px;
+      line-height: 1.4;
+      border-left: 3px solid #1e88e5;
+    }
+
+    .ai-result table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .ai-result table td {
+      padding: 5px 8px;
+      vertical-align: top;
+    }
+
+    .ai-result table td:first-child {
+      font-weight: 600;
+      width: 80px;
+      color: #555;
+    }
+
+    .ai-result .rating {
+      font-weight: bold;
+      color: #1e88e5;
+      white-space: nowrap;
+    }
+
+    .ai-result .pros { color: #2e7d32; }
+    .ai-result .cons { color: #c62828; }
+    .ai-result .for-item { color: #6a1b9a; }
+
+    .ai-result pre {
+      margin: 0;
+      white-space: pre-wrap;
+      font-size: 11px;
+    }
+
+    @media (max-width: 768px) {
+      .header {
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+
+      .stats {
+        flex-wrap: wrap;
+      }
+
+      .favorites-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>🛍️ Saved Products</h1>
+      <div class="header-actions">
+        <button class="btn btn-danger" id="clear-all">Clear All Favorites</button>
+      </div>
+    </div>
+
+    <div class="stats" id="stats">
+      <div class="stat">
+        <div class="stat-value" id="total-count">0</div>
+        <div class="stat-label">Total Saved</div>
+      </div>
+    </div>
+
+    <div class="favorites-list" id="favorites-list"></div>
+  </div>
+
+  <script src="favorites.js"></script>
+</body>
+</html>

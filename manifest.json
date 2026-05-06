@@ -3,16 +3,12 @@
   "name": "Temu Product Analyzer",
   "version": "1.0.0",
   "description": "Detects and displays fabric/material information on e-commerce product pages",
-  "permissions": ["activeTab"],
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://openrouter.ai/*"],
   "content_scripts": [
     {
       "matches": [
-        "*://*.temu.com/*",
-        "*://*.trendyol.com/*",
-        "*://*.shein.com/*",
-        "*://*.amazon.com/*",
-        "*://*.aliexpress.com/*",
-        "*://*/*"
+        "*://*.temu.com/*"
       ],
       "js": ["content.js"],
       "css": ["styles.css"],
@@ -31,5 +27,11 @@
     "16": "icon16.png",
     "48": "icon48.png",
     "128": "icon128.png"
-  }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["favorites.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
 }
