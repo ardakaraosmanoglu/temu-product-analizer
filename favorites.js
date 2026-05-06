@@ -2,10 +2,123 @@
  * Favorites Page - Full screen view with images and AI review
  */
 
+const I18N = {
+  currentLang: 'en',
+
+  translations: {
+    en: {
+      savedProducts: 'Saved Products',
+      totalSaved: 'Total Saved',
+      noSavedProducts: 'No saved products yet',
+      noSavedProductsHint: 'Save products from Temu using the extension widget to see them here',
+      clearAll: 'Clear All Favorites',
+      info: 'Info',
+      hideInfo: 'Hide Info',
+      allFields: 'All Fields',
+      material: 'Material',
+      materialDesc: 'Material type (Cotton, Polyester etc.)',
+      composition: 'Composition',
+      compositionDesc: 'Composition ratios (e.g: 100% Polyester)',
+      season: 'Season',
+      seasonDesc: 'Season recommendation based on breathability',
+      quality: 'Quality',
+      qualityDesc: 'Quality grade (A/B/C/D class)',
+      warning: 'Warning',
+      warningDesc: 'Fabric warning (sensitivity etc.)',
+      qualityGrades: 'Quality Grades',
+      gradeA: 'A Class - Best quality - Premium product',
+      gradeB: 'B Class - Good quality - Standard product',
+      gradeC: 'C Class - Medium quality - Budget friendly',
+      gradeD: 'D Class - Low quality - Be careful',
+      seasonRatings: 'Season Ratings',
+      summerPerfect: 'Breathability ≥ 4.5 - Perfect for summer',
+      transitionIdeal: 'Breathability ≥ 3 - Ideal for transitions',
+      canKeepCool: 'Breathability ≥ 2 - Can keep cool',
+      forWinter: 'Breathability < 2 - For winter',
+      warnings: 'Warnings',
+      lowBreathability: 'Low breathability - Sweating in hot weather with synthetics like polyester',
+      sensitivity: 'Sensitivity - Risk of skin sensitivity to certain fabrics',
+      seasonLabel: 'Season',
+      qualityLabel: 'Quality',
+      delete: 'Delete',
+      openProduct: 'Open Product'
+    },
+    tr: {
+      savedProducts: 'Kaydedilen Ürünler',
+      totalSaved: 'Toplam Kaydedilen',
+      noSavedProducts: 'Henüz kaydedilen ürün yok',
+      noSavedProductsHint: 'Temu\'dan widget\'ı kullanarak ürün kaydedin',
+      clearAll: 'Tümünü Temizle',
+      info: 'Bilgi',
+      hideInfo: 'Bilgiyi Gizle',
+      allFields: 'Tüm Alanlar',
+      material: 'Malzeme',
+      materialDesc: 'Malzeme türü (Pamuk, Polyester vb.)',
+      composition: 'Bileşim',
+      compositionDesc: 'Bileşim oranları (örn: %100 Polyester)',
+      season: 'Mevsim',
+      seasonDesc: 'Nefes alanlılığa göre mevsim önerisi',
+      quality: 'Kalite',
+      qualityDesc: 'Kalite sınıfı (A/B/C/D sınıfı)',
+      warning: 'Uyarı',
+      warningDesc: 'Kumaş uyarısı (hassasiyet vb.)',
+      qualityGrades: 'Kalite Sınıfları',
+      gradeA: 'A Sınıfı - En yüksek kalite - Premium ürün',
+      gradeB: 'B Sınıfı - İyi kalite - Standart ürün',
+      gradeC: 'C Sınıfı - Orta kalite - Bütçe dostu',
+      gradeD: 'D Sınıfı - Düşük kalite - Dikkatli olun',
+      seasonRatings: 'Mevsim Dereceleri',
+      summerPerfect: 'Nefes Alanlık ≥ 4.5 - Yaz için mükemmel',
+      transitionIdeal: 'Nefes Alanlık ≥ 3 - Mevsim geçişleri için ideal',
+      canKeepCool: 'Nefes Alanlık ≥ 2 - Serin tutabilir',
+      forWinter: 'Nefes Alanlık < 2 - Kış için uygun',
+      warnings: 'Uyarılar',
+      lowBreathability: 'Az hava geçirgenliği - Polyester vb. sentetiklerde sıcak havalarda terleme',
+      sensitivity: 'Hassasiyet - Belirli kumaşlara karşı cilt hassasiyeti riski',
+      seasonLabel: 'Mevsim',
+      qualityLabel: 'Kalite',
+      delete: 'Sil',
+      openProduct: 'Ürünü Aç'
+    }
+  },
+
+  t(key) {
+    return this.translations[this.currentLang]?.[key] || this.translations.en[key] || key;
+  },
+
+  setLang(lang) {
+    this.currentLang = lang === 'tr' ? 'tr' : 'en';
+  }
+};
+
 document.addEventListener('DOMContentLoaded', function() {
   const favoritesListEl = document.getElementById('favorites-list');
   const totalCountEl = document.getElementById('total-count');
   const clearAllBtn = document.getElementById('clear-all');
+
+  // Load language setting
+  chrome.storage.local.get(['lang'], (result) => {
+    I18N.setLang(result.lang || 'en');
+    applyI18n();
+    loadFavorites();
+  });
+
+  function applyI18n() {
+    document.querySelector('#stats .stat-label').textContent = I18N.t('totalSaved');
+    clearAllBtn.textContent = I18N.t('clearAll');
+    document.querySelector('.header h1').textContent = I18N.t('savedProducts');
+
+    // Update info box
+    const ids = ['allFields', 'material', 'materialDesc', 'composition', 'compositionDesc',
+      'season', 'seasonDesc', 'quality', 'qualityDesc', 'warning', 'warningDesc',
+      'qualityGrades', 'gradeA', 'gradeB', 'gradeC', 'gradeD',
+      'seasonRatings', 'summerPerfect', 'transitionIdeal', 'canKeepCool', 'forWinter',
+      'warnings', 'lowBreath', 'sensitivity'];
+    ids.forEach(id => {
+      const el = document.getElementById('i18n-' + id);
+      if (el) el.textContent = I18N.t(id);
+    });
+  }
 
   function loadFavorites() {
     chrome.storage.local.get(['favorites', 'apiKey'], (result) => {
@@ -25,7 +138,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (favorites.length === 0) {
       const empty = document.createElement('div');
       empty.className = 'empty-state';
-      empty.innerHTML = '<div class="empty-icon">♡</div><div class="empty-title">No saved products yet</div><div class="empty-text">Save products from Temu using the extension widget to see them here</div>';
+      empty.innerHTML = `<div class="empty-icon">♡</div><div class="empty-title">${I18N.t('noSavedProducts')}</div><div class="empty-text">${I18N.t('noSavedProductsHint')}</div>`;
       favoritesListEl.appendChild(empty);
       return;
     }
@@ -79,19 +192,19 @@ document.addEventListener('DOMContentLoaded', function() {
     body.className = 'card-body';
 
     if (fav.material) {
-      body.appendChild(createRow('Material', fav.material, 'material'));
+      body.appendChild(createRow(I18N.t('material'), fav.material, 'material'));
     }
     if (fav.composition) {
-      body.appendChild(createRow('Composition', fav.composition));
+      body.appendChild(createRow(I18N.t('composition'), fav.composition));
     }
     if (fav.seasonalRating) {
-      body.appendChild(createRow('Season', fav.seasonalRating.label || '', 'season'));
+      body.appendChild(createRow(I18N.t('seasonLabel'), fav.seasonalRating.label || '', 'season'));
     }
     if (fav.qualityGrade) {
-      body.appendChild(createRow('Quality', fav.qualityGrade.gradeLabel || fav.qualityGrade.grade || ''));
+      body.appendChild(createRow(I18N.t('qualityLabel'), fav.qualityGrade.gradeLabel || fav.qualityGrade.grade || ''));
     }
     if (fav.warning) {
-      body.appendChild(createRow('Warning', '⚠️ ' + fav.warning, 'warning'));
+      body.appendChild(createRow(I18N.t('warning'), '⚠️ ' + fav.warning, 'warning'));
     }
 
     // Meta
@@ -163,12 +276,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const openBtn = document.createElement('button');
     openBtn.className = 'card-btn open';
-    openBtn.textContent = 'Open Product';
+    openBtn.textContent = I18N.t('openProduct');
     openBtn.dataset.url = fav.url;
 
     const delBtn = document.createElement('button');
     delBtn.className = 'card-btn delete';
-    delBtn.textContent = 'Delete';
+    delBtn.textContent = I18N.t('delete');
     delBtn.dataset.index = index;
 
     actions.appendChild(openBtn);
@@ -390,11 +503,9 @@ Return ONLY valid JSON, no explanation.`;
     toggleInfoBtn.addEventListener('click', () => {
       const isHidden = infoBox.style.display === 'none';
       infoBox.style.display = isHidden ? 'block' : 'none';
-      toggleInfoBtn.textContent = isHidden ? '🔼 Info' : 'ℹ️ Info';
+      toggleInfoBtn.textContent = isHidden ? '🔼 ' + I18N.t('hideInfo') : 'ℹ️ ' + I18N.t('info');
     });
   }
-
-  loadFavorites();
 
   // Auto-refresh when AI review is generated and saved (after initial page load)
   chrome.storage.onChanged.addListener((changes, area) => {
