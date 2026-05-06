@@ -15,6 +15,9 @@
 | 3. Enable **Developer mode** (top right). | 3. **Geliştirici modu**nu aktif edin (sağ üst). |
 | 4. Click **Load unpacked** & select `chrome-extension` folder. | 4. **Paketlenmemiş öğe yükle** diyerek `chrome-extension` klasörünü seçin. |
 
+<sub>**Note:** For AI features, you must register on [OpenRouter](https://openrouter.ai/) and enter your API key in the extension settings.</sub>  
+<sub>**Not:** AI özellikleri için OpenRouter üzerinden kayıt olarak ayarlardan API girişi sağlamalısınız.</sub>
+
 ![Project Preview](chrome-extension/temu-analizer-logo.png)
 
 ## 🌟 Why Use Temu Vision?
