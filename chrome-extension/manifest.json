@@ -8,7 +8,15 @@
   "content_scripts": [
     {
       "matches": [
-        "*://*.temu.com/*"
+        "*://*.temu.com/*",
+        "*://*.trendyol.com/*",
+        "*://*.shein.com/*",
+        "*://*.shein.com.tr/*",
+        "*://*.amazon.com/*",
+        "*://*.amazon.com.tr/*",
+        "*://*.amazon.de/*",
+        "*://*.amazon.co.uk/*",
+        "*://*.aliexpress.com/*"
       ],
       "js": ["content.js"],
       "css": ["styles.css"],

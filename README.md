@@ -44,11 +44,14 @@ To unlock the full power of AI Review Analysis:
 
 ## 📱 Supported Platforms
 
-While optimized for **Temu**, our analyzer also works on:
-*   ✅ Trendyol
-*   ✅ SHEIN
-*   ✅ Amazon
-*   ✅ AliExpress
+## 📱 Supported Platforms
+ 
+ Temu Vision works seamlessly on:
+ *   ✅ **Temu** (Fully Optimized)
+ *   ✅ **Trendyol**
+ *   ✅ **SHEIN**
+ *   ✅ **Amazon** (.com, .com.tr, .de, .co.uk)
+ *   ✅ **AliExpress**
 
 ## 🛡️ Privacy & Safety
 

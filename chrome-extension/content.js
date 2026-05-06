@@ -613,9 +613,13 @@
   function scanPage() {
     const data = {};
 
-    // 1. Scan Temu-specific data structures (highest priority)
+    // 1. Scan site-specific data structures
     if (window.location.hostname.includes('temu.com')) {
       scanTemuSpecific(data);
+    } else {
+      // For other sites, try to get product data generically
+      const genericData = extractGenericProductData();
+      Object.assign(data, genericData);
     }
 
     // 2. Scan JSON-LD structured data
@@ -639,8 +643,12 @@
     // 8. Calculate quality grade
     data.qualityGrade = calculateQualityGrade(data);
 
-    // 9. Scan reviews (using getTemuReviewData which returns items array for AI review)
-    data.reviews = getTemuReviewData(10);
+    // 9. Scan reviews
+    if (window.location.hostname.includes('temu.com')) {
+      data.reviews = getTemuReviewData(10);
+    } else {
+      data.reviews = scanGenericReviews();
+    }
 
     return data;
   }
@@ -876,7 +884,7 @@
   function isLikelyProductImage(url) {
     if (!url) return false;
     const lower = url.toLowerCase();
-    const allowedPatterns = ["img.kwcdn.com", "temu.com", "goods", "product", "main", "thumbnail"];
+    const allowedPatterns = ["img.kwcdn.com", "temu.com", "dsmcdn.com", "shein.com", "amazon.com", "media-amazon.com", "alicdn.com", "aliexpress", "goods", "product", "main", "thumbnail"];
     const blockedPatterns = ["avatar", "logo", "icon", "sprite", "payment", "review", "user", "profile", "captcha"];
     const isImage = lower.includes(".jpg") || lower.includes(".jpeg") || lower.includes(".png") || lower.includes(".webp") || lower.includes("image");
     const allowed = allowedPatterns.some(pattern => lower.includes(pattern));
@@ -902,7 +910,7 @@
     return [...images];
   }
 
-  function extractTemuProductImages() {
+  function extractProductImages() {
     const images = new Set();
 
     // 1. JSON-LD images
@@ -945,8 +953,7 @@
       }
     }
 
-    // Filter for Temu product images specifically
-    return [...images].filter(url => url && url.includes("img.kwcdn.com") && !url.includes("avatar") && !url.includes("review"));
+    return [...images].filter(url => url && !url.includes("avatar") && !url.includes("review"));
   }
 
   function extractTemuProductData() {
@@ -970,7 +977,7 @@
     };
 
     // Extract images first
-    result.images = extractTemuProductImages();
+    result.images = extractProductImages();
 
     // 1. JSON-LD extraction (highest priority)
     const product = getJsonLdProduct();
@@ -1013,6 +1020,39 @@
     result.reviews = getTemuReviewData(10);
 
     return result;
+  }
+
+  function extractGenericProductData() {
+    const result = {
+      title: document.title,
+      images: extractProductImages(),
+      rawSpecs: {}
+    };
+
+    // Try to find material info in meta tags
+    const metaDescription = document.querySelector('meta[name="description"]')?.content || "";
+    const metaKeywords = document.querySelector('meta[name="keywords"]')?.content || "";
+    const combinedText = (metaDescription + " " + metaKeywords).toLowerCase();
+
+    for (const keyword of FABRIC_KEYWORDS) {
+      if (combinedText.includes(keyword)) {
+        result.material = keyword.charAt(0).toUpperCase() + keyword.slice(1);
+        break;
+      }
+    }
+
+    return result;
+  }
+
+  function scanGenericReviews() {
+    const reviews = scanReviews();
+    if (!reviews) return null;
+    return {
+      source: "dom_scan",
+      returnedCount: reviews.count,
+      averageRating: reviews.averageRating,
+      items: [] // No deep extraction for generic sites yet
+    };
   }
 
   function scanTemuSpecific(data) {
