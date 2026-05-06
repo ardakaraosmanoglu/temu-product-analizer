@@ -70,6 +70,15 @@
       background: #ffcdd2;
     }
 
+    .btn-info {
+      background: #e3f2fd;
+      color: #1e88e5;
+    }
+
+    .btn-info:hover {
+      background: #bbdefb;
+    }
+
     .stats {
       display: flex;
       gap: 24px;
@@ -308,6 +317,42 @@
       background: #c8e6c9;
     }
 
+    .info-box {
+      background: white;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .info-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 12px;
+    }
+
+    .info-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .info-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #f0f0f0;
+    }
+
+    .info-table td:first-child {
+      font-weight: 600;
+      width: 160px;
+      color: #1e88e5;
+    }
+
+    .info-table tr:last-child td {
+      border-bottom: none;
+    }
+
     .card-reviews-container {
       margin-top: 8px;
       padding: 8px;
@@ -413,6 +458,40 @@
         <div class="stat-value" id="total-count">0</div>
         <div class="stat-label">Total Saved</div>
       </div>
+      <button class="btn btn-info" id="toggle-info">ℹ️ Info</button>
+    </div>
+
+    <div class="info-box" id="info-box" style="display:none;">
+      <div class="info-title">📋 Tüm Alanlar</div>
+      <table class="info-table">
+        <tr><td>Material</td><td>Malzeme türü (Pamuk, Polyester vb.)</td></tr>
+        <tr><td>Composition</td><td>Bileşim oranları (örn: %100 Polyester)</td></tr>
+        <tr><td>Season</td><td>Nefes alanlılığa göre mevsim önerisi</td></tr>
+        <tr><td>Quality</td><td>Kalite sınıfı (A/B/C/D sınıfı)</td></tr>
+        <tr><td>Warning</td><td>⚠️ Kumaş uyarısı (hassasiyet vb.)</td></tr>
+      </table>
+
+      <div class="info-title" style="margin-top:16px;">🏆 Kalite Sınıfları</div>
+      <table class="info-table">
+        <tr><td>A Sınıfı</td><td>En yüksek kalite - Premium ürün</td></tr>
+        <tr><td>B Sınıfı</td><td>İyi kalite - Standard ürün</td></tr>
+        <tr><td>C Sınıfı</td><td>Orta kalite - Bütçe dostu</td></tr>
+        <tr><td>D Sınıfı</td><td>Düşük kalite - Dikkatli olun</td></tr>
+      </table>
+
+      <div class="info-title" style="margin-top:16px;">🌡️ Mevsim Dereceleri</div>
+      <table class="info-table">
+        <tr><td>☀️ Yaz Mükemmel</td><td>Nefes Alanlık ≥ 4.5 - Yaz için mükemmel</td></tr>
+        <tr><td>🌤️ Geçiş Ideal</td><td>Nefes Alanlık ≥ 3 - Mevsim geçişleri için ideal</td></tr>
+        <tr><td>🌡️ Serin Tutabilir</td><td>Nefes Alanlık ≥ 2 - Serin tutabilir</td></tr>
+        <tr><td>❄️ Kış İçin</td><td>Nefes Alanlık &lt; 2 - Kış için uygun</td></tr>
+      </table>
+
+      <div class="info-title" style="margin-top:16px;">⚠️ Uyarılar</div>
+      <table class="info-table">
+        <tr><td>Az hava geçirgenliği</td><td>Polyester vb. sentetiklerde sıcak havalarda terleme</td></tr>
+        <tr><td>Hassasiyet</td><td>Belirli kumaşlara karşı cilt hassasiyeti riski</td></tr>
+      </table>
     </div>
 
     <div class="favorites-list" id="favorites-list"></div>

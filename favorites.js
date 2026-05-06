@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
       body.appendChild(createRow('Composition', fav.composition));
     }
     if (fav.seasonalRating) {
-      body.appendChild(createRow('Season', (fav.seasonalRating.icon || '') + ' ' + (fav.seasonalRating.label || ''), 'season'));
+      body.appendChild(createRow('Season', fav.seasonalRating.label || '', 'season'));
     }
     if (fav.qualityGrade) {
       body.appendChild(createRow('Quality', fav.qualityGrade.gradeLabel || fav.qualityGrade.grade || ''));
@@ -383,6 +383,16 @@ Return ONLY valid JSON, no explanation.`;
       loadFavorites();
     }
   });
+
+  const toggleInfoBtn = document.getElementById('toggle-info');
+  const infoBox = document.getElementById('info-box');
+  if (toggleInfoBtn && infoBox) {
+    toggleInfoBtn.addEventListener('click', () => {
+      const isHidden = infoBox.style.display === 'none';
+      infoBox.style.display = isHidden ? 'block' : 'none';
+      toggleInfoBtn.textContent = isHidden ? '🔼 Info' : 'ℹ️ Info';
+    });
+  }
 
   loadFavorites();
 
