@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Temu Product Analyzer",
+  "name": "Temu Vision",
   "version": "1.0.0",
   "description": "Detects and displays fabric/material information on e-commerce product pages",
   "permissions": ["activeTab", "storage"],
