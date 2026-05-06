@@ -1,14 +1,14 @@
-# 🛍️ Temu Product Analyzer
+# 👁️ Temu Vision
 
 [![Chrome Web Store](https://img.shields.io/badge/Chrome-Extension-blue?logo=google-chrome&logoColor=white)](https://chrome.google.com/webstore)
 [![Version](https://img.shields.io/badge/version-1.0.0-green.svg)](https://github.com/ardakaraosmanoglu/temu-product-analizer)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Shop Smarter, Not Harder.** The Temu Product Analyzer is a powerful browser extension designed to help you decode e-commerce product listings, understand material quality, and make informed purchasing decisions on Temu and beyond.
+**Shop Smarter, Not Harder.** Temu Vision is a powerful browser extension designed to help you decode e-commerce product listings, understand material quality, and make informed purchasing decisions on Temu and beyond.
 
 ![Project Preview](chrome-extension/temu-analizer-logo.png)
 
-## 🌟 Why Use Temu Product Analyzer?
+## 🌟 Why Use Temu Vision?
 
 Have you ever wondered if that "Cotton" shirt is actually 100% cotton, or if it will shrink after the first wash? Our extension analyzes hidden data and user reviews to give you the real story behind every product.
 
